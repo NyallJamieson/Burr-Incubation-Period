@@ -44,7 +44,48 @@ Model_burrDerived <- fitdist(data,"dburr",method="mle",start=list(a=1,b=1,T=1))
 # the likelihood is used for estimating the Bayes factor also obtained in table 2
 # the parameter estimates in table 3 are obtained from the summary of these outputs
 
-
+# now we conduct calculations for the akaike weights and bayes factors analysis in table 2
+# ais and log likelihood values from analysis
+aic1 <- 549.32
+aic2 <- 547.83
+aic3 <- 547.62
+aic4 <- 548.29
+aic5 <- 547.67
+ll1 <- -272.66
+ll2 <- -270.92
+ll3 <- -271.81
+ll4 <- -271.15
+ll5 <- -270.84
+# extract minimum aic out of models
+min <- min(aic1,aic2,aic3,aic4,aic5)
+# extract difference of aic from minimum aic
+diff1 <- aic1-min
+diff2 <- aic2-min
+diff3 <- aic3-min
+diff4 <- aic4-min
+diff5 <- aic5-min
+# calculate akaike weights
+w1 <- exp(-0.5*diff1)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5))
+w2 <- exp(-0.5*diff2)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5))
+w3 <- exp(-0.5*diff3)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5))
+w4 <- exp(-0.5*diff4)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5))
+w5 <- exp(-0.5*diff5)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5))
+# values for analysis in table 2
+w1/w1
+w2/w1
+w3/w1
+w4/w1
+w5/w1
+# more values for analysis in table 2
+w2/(w2+w1)
+w3/(w3+w1)
+w4/(w4+w1)
+w5/(w5+w1)
+# more values for analysis in table 2
+bf2 <- log10(exp(ll2-ll1))
+bf3 <- log10(exp(ll3-ll1))
+bf4 <- log10(exp(ll4-ll1))
+bf5 <- log10(exp(ll5-ll1))
 
 # code for producing figure 2
 hist(MelbourneIP,breaks=seq(0,20,by=1),xlab="Time in Days",ylab="Density",main="Melbourne Data with Model Fits")
