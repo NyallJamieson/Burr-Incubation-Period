@@ -393,12 +393,51 @@ lines(y,length(MelbourneIP)*values,type="s",col=7)
 plot.new()
 legend("center",legend=c("Original","DI"),col=c("red",7),lwd = 5, xpd = FALSE, horiz = TRUE, cex = 1, seg.len=1, bty = 'n')
 
+# we provide the code for obtaining the akaike weights and bayes factor analysis in table 5
+# ais and log likelihood values from analysis
+aic1 <- 552.66
+aic2 <- 548.84
+aic3 <- 549.18
+aic4 <- 550.54
+aic5 <- 547.50
+ll1 <- -274.33
+ll2 <- -271.42
+ll3 <- -272.59
+ll4 <- -272.27
+ll5 <- -270.75
+# extract minimum aic out of models
+min <- min(aic1,aic2,aic3,aic4,aic5)
+# extract difference of aic from minimum aic
+diff1 <- aic1-min
+diff2 <- aic2-min
+diff3 <- aic3-min
+diff4 <- aic4-min
+diff5 <- aic5-min
+# calculate akaike weights
+w1 <- exp(-0.5*diff1)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5))
+w2 <- exp(-0.5*diff2)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5))
+w3 <- exp(-0.5*diff3)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5))
+w4 <- exp(-0.5*diff4)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5))
+w5 <- exp(-0.5*diff5)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5))
+# values for analysis in table 2
+w1/w1
+w2/w1
+w3/w1
+w4/w1
+w5/w1
+# more values for analysis in table 2
+w2/(w2+w1)
+w3/(w3+w1)
+w4/(w4+w1)
+w5/(w5+w1)
+# more values for analysis in table 2
+bf2 <- log10(exp(ll2-ll1))
+bf3 <- log10(exp(ll3-ll1))
+bf4 <- log10(exp(ll4-ll1))
+bf5 <- log10(exp(ll5-ll1))
+
 # for producing the results in table 6 we use the DI likelihood fitting methods coded above with the other disease data, instead of the "MelbourneIP" legionella data
-
-
-
 # here we now provide the code to fit the DI likelihood methods to each other disease datasets
-
 # we first analyse anthrax dataset
 # code for the DI gamma model
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
