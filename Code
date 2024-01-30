@@ -574,7 +574,7 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(c=2.1,k=2.5,s=1.1),lower=c(1,1.5,1),upper=c(9,250,250),likelihood,control = list(fnscale = -1))
+result <- optim(c(c=2.1,k=2.5,s=1.1),lower=c(3,3,3),upper=c(10,10000,1000),likelihood,control = list(fnscale = -1))
 # Burr XII parameters
 result$par
 # Burr XII DI log likelihood
@@ -949,7 +949,7 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(c=2.1,k=2.5,s=1.1),lower=c(1,1.15,2),upper=c(9,75,75),likelihood,control = list(fnscale = -1))
+result <- optim(c(c=2.1,k=2.5,s=1.1),lower=c(1,1.15,2),upper=c(25,75,75),likelihood,control = list(fnscale = -1))
 # Burr XII parameters
 result$par
 # Burr XII DI log likelihood
@@ -1324,7 +1324,7 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(c=2.1,k=2.5,s=1.1),lower=c(1,1.15,2),upper=c(9,150,150),likelihood,control = list(fnscale = -1))
+result <- optim(c(c=2.1,k=2.5,s=1.1),lower=c(1,1.15,2),upper=c(9,1500,150),likelihood,control = list(fnscale = -1))
 # Burr XII parameters
 result$par
 # Burr XII DI log likelihood
@@ -1606,3 +1606,67 @@ result$par
 result$value
 # derived Burr DI AIC
 result$value*-2+6
+
+
+# we now want to plot each dataset with curve fits from normal maximum likelihood methods as well as the DI likelihood method plotted on top as was done for the legionella data
+# first need to find parameters of distributions when fitting by normal maximum likelihood methods
+# find parameters for anthrax dataset
+fitdist(anthrax,"gamma",method="mle")
+fitdist(anthrax,"burr3",method="mle",start=list(c=1,k=1,s=1))
+fitdist(anthrax,"burr10",method="mle",start=list(c=5,k=5))
+fitdist(anthrax,"burr12",method="mle",start=list(c=1,k=10,s=1))
+fitdist(anthrax,"dburr",method="mle",start=list(a=0.3,b=100,T=1))
+# find parameters for first salmonellosis dataset
+fitdist(salm1,"gamma",method="mle")
+fitdist(salm1,"burr3",method="mle",start=list(c=1,k=1,s=1))
+fitdist(salm1,"burr10",method="mle",start=list(c=5,k=5))
+fitdist(salm1,"burr12",method="mle",start=list(c=1,k=10,s=1))
+fitdist(salm1,"dburr",method="mle",start=list(a=0.3,b=50,T=1))
+# find parameters for second salmonellosis dataset
+fitdist(salm2,"gamma",method="mle")
+fitdist(salm2,"burr3",method="mle",start=list(c=1,k=1,s=1))
+fitdist(salm2,"burr10",method="mle",start=list(c=5,k=5))
+fitdist(salm2,"burr12",method="mle",start=list(c=1,k=10,s=1))
+fitdist(salm2,"dburr",method="mle",start=list(a=0.3,b=50,T=1))
+# find parameters for third salmonellosis dataset
+fitdist(salm3,"gamma",method="mle")
+fitdist(salm3,"burr3",method="mle",start=list(c=1,k=1,s=1))
+fitdist(salm3,"burr10",method="mle",start=list(c=5,k=5))
+fitdist(salm3,"burr12",method="mle",start=list(c=1,k=10,s=1))
+fitdist(salm3,"dburr",method="mle",start=list(a=0.3,b=100,T=1))
+# find parameters for fourth salmonellosis dataset
+fitdist(salm4,"gamma",method="mle")
+fitdist(salm4,"burr3",method="mle",start=list(c=1,k=1,s=1))
+fitdist(salm4,"burr10",method="mle",start=list(c=5,k=5))
+fitdist(salm4,"burr12",method="mle",start=list(c=1,k=10,s=1))
+fitdist(salm4,"dburr",method="mle",start=list(a=1,b=100,T=10))
+# find parameters for first campylobacteriosis dataset
+fitdist(camp1,"gamma",method="mle")
+fitdist(camp1,"burr3",method="mle",start=list(c=1,k=1,s=1))
+fitdist(camp1,"burr10",method="mle",start=list(c=1,k=1))
+fitdist(camp1,"burr12",method="mle",start=list(c=1,k=10,s=1))
+fitdist(camp1,"dburr",method="mle",start=list(a=1,b=1,T=1))
+# find parameters for second campylobacteriosis dataset
+fitdist(camp2,"gamma",method="mle")
+fitdist(camp2,"burr3",method="mle",start=list(c=1,k=1,s=1))
+fitdist(camp2,"burr10",method="mle",start=list(c=1,k=1))
+fitdist(camp2,"burr12",method="mle",start=list(c=1,k=10,s=1))
+fitdist(camp2,"dburr",method="mle",start=list(a=1,b=1,T=1))
+# find parameters for third campylobacteriosis dataset
+fitdist(camp3,"gamma",method="mle")
+fitdist(camp3,"burr3",method="mle",start=list(c=1,k=1,s=1))
+fitdist(camp3,"burr10",method="mle",start=list(c=1,k=1))
+fitdist(camp3,"burr12",method="mle",start=list(c=1,k=10,s=1))
+fitdist(camp3,"dburr",method="mle",start=list(a=1,b=1,T=1))
+# find parameters for fourth campylobacteriosis dataset
+fitdist(camp4,"gamma",method="mle")
+fitdist(camp4,"burr3",method="mle",start=list(c=1,k=1,s=1))
+fitdist(camp4,"burr10",method="mle",start=list(c=1,k=1))
+fitdist(camp4,"burr12",method="mle",start=list(c=1,k=10,s=1))
+fitdist(camp4,"dburr",method="mle",start=list(a=1,b=1,T=1))
+# find parameters for fifth campylobacteriosis dataset
+fitdist(camp5,"gamma",method="mle")
+fitdist(camp5,"burr3",method="mle",start=list(c=1,k=1,s=1))
+fitdist(camp5,"burr10",method="mle",start=list(c=1,k=1))
+fitdist(camp5,"burr12",method="mle",start=list(c=1,k=10,s=1))
+fitdist(camp5,"dburr",method="mle",start=list(a=1,b=1,T=1))
