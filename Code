@@ -67,7 +67,7 @@ lines(seq(0,20,by=0.01),-log(1-plnorm(seq(0,20,by=0.01),meanlog=1.740,sdlog=0.48
 lines(seq(0,20,by=0.01),-log(1-pweibull(seq(0,20,by=0.01),shape=2.447,scale=7.129)),type="l",col=5)
 legend(x="topleft",legend=c("Type III", "Type X", "Type XII", "Derived", "Gamma", "Lognormal", "Weibull"),lty=c(1,1,1,1,1,1,1),col=c(2,3,4,7,8,9,5),lwd=2)
 
-# code for producing DI likelihood
+# code for producing DI likelihood on legionnaires' disease dataset
 # code for the DI gamma model
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
@@ -79,8 +79,8 @@ fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
 likelihood <- function(z){
 	a <- z[1]
 	b <- z[2]
-	for (i in 1:length(MelbourneIP)){
-		my.sum=my.sum+fun01(a,b,MelbourneIP[i])
+	for (i in 1:length(legionnaires)){
+		my.sum=my.sum+fun01(a,b,legionnaires[i])
 	} 
 	return(my.sum)
 }
@@ -104,8 +104,8 @@ likelihood <- function(z){
 	c <- z[1]
 	k <- z[2]
 	t <- z[3]
-	for (i in 1:length(MelbourneIP)){
-		my.sum=my.sum+fun01(c,k,t,MelbourneIP[i])
+	for (i in 1:length(legionnaires)){
+		my.sum=my.sum+fun01(c,k,t,legionnaires[i])
 		} 
 	return(my.sum)
 	}
@@ -128,8 +128,8 @@ fun01 <- function(c,k,S){ifelse(S!=1,fun01.2(c,k,S),fun01.1(c,k,S))}
 likelihood <- function(y){
 	c <- y[1]
 	k <- y[2]
-	for (i in 1:length(MelbourneIP)){
-		my.sum=my.sum+fun01(c,k,MelbourneIP[i])
+	for (i in 1:length(legionnaires)){
+		my.sum=my.sum+fun01(c,k,legionnaires[i])
 	} 
 	return(my.sum)
 }
@@ -153,8 +153,8 @@ likelihood <- function(y){
 	c <- y[1]
 	k <- y[2]
 	s <- y[3]
-	for (i in 1:length(MelbourneIP)){
-		my.sum=my.sum+fun01(c,k,s,MelbourneIP[i])
+	for (i in 1:length(legionnaires)){
+		my.sum=my.sum+fun01(c,k,s,legionnaires[i])
 	} 
 	return(my.sum)
 }
@@ -178,8 +178,8 @@ likelihood <- function(y){
 	a <- y[1]
 	b <- y[2]
 	T <- y[3]
-	for (i in 1:length(MelbourneIP)){
-		my.sum=my.sum+fun01(a,b,T,MelbourneIP[i])
+	for (i in 1:length(legionnaires)){
+		my.sum=my.sum+fun01(a,b,T,legionnaires[i])
 	} 
 	return(my.sum)
 }
@@ -192,7 +192,7 @@ result$value
 result$value*-2+6
 # Output for these DI log likelihood fitting provides values given in tables 4 and 5
 
-# code for bootstrapping confidence intervals of the mean for each model
+# code for bootstrapping confidence intervals of the mean for each model, for table 6
 # code for gamma, means1 is model from using normal data, means2 is model from considering the DI approach
 means1 <- c()
 for (j in 1:10000){
@@ -355,3 +355,1254 @@ legend("center",legend=c("Original","DI"),col=c("red",7),lwd = 5, xpd = FALSE, h
 # for producing the results in table 6 we use the DI likelihood fitting methods coded above with the other disease data, instead of the "MelbourneIP" legionella data
 
 
+
+# here we now provide the code to fit the DI likelihood methods to each other disease datasets
+
+# we first analyse anthrax dataset
+# code for the DI gamma model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(anthrax)){
+		my.sum=my.sum+fun01(a,b,anthrax[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1))
+# gamma parameters
+result$par
+# gamma DI log likelihood
+result$value
+# gamma DI AIC
+result$value*-2+4
+
+# code for DI Burr III model
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.1 <- function(c,k,t,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.2 <- function(c,k,t,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,t,S){ifelse(S!=1,fun01.2(c,k,t,S),fun01.1(c,k,t,S))}
+likelihood <- function(z){
+	c <- z[1]
+	k <- z[2]
+	t <- z[3]
+	for (i in 1:length(anthrax)){
+		my.sum=my.sum+fun01(c,k,t,anthrax[i])
+		} 
+	return(my.sum)
+	}
+result <- optim(c(c=11,k=11,t=11),lower=c(0.4,0.1,0.5),upper=c(100,100,100),likelihood,control = list(fnscale = -1))
+# Burr III parameters
+result$par
+# Burr III DI log likelihood
+result$value
+# Burr III DI AIC
+result$value*-2+6
+
+# code for DI Burr X model
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.1 <- function(c,k,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.2 <- function(c,k,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,S){ifelse(S!=1,fun01.2(c,k,S),fun01.1(c,k,S))}
+likelihood <- function(y){
+	c <- y[1]
+	k <- y[2]
+	for (i in 1:length(anthrax)){
+		my.sum=my.sum+fun01(c,k,anthrax[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(c=1,k=1),lower=c(5,0.5),upper=c(25,50,50),likelihood,control = list(fnscale = -1))
+# Burr X parameters
+result$par
+# Burr X DI log likelihood
+result$value
+# Burr X DI AIC
+result$value*-2+4
+
+# code for DI Burr XII model
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.1 <- function(c,k,s,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.2 <- function(c,k,s,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,s,S){ifelse(S!=1,fun01.2(c,k,s,S),fun01.1(c,k,s,S))}
+likelihood <- function(y){
+	c <- y[1]
+	k <- y[2]
+	s <- y[3]
+	for (i in 1:length(anthrax)){
+		my.sum=my.sum+fun01(c,k,s,anthrax[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(c=2.1,k=2.5,s=1.1),lower=c(1,1.5,1),upper=c(9,50,50),likelihood,control = list(fnscale = -1))
+# Burr XII parameters
+result$par
+# Burr XII DI log likelihood
+result$value
+# Burr XII DI AIC
+result$value*-2+6
+
+# code for derived Burr model
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
+likelihood <- function(y){
+	a <- y[1]
+	b <- y[2]
+	T <- y[3]
+	for (i in 1:length(anthrax)){
+		my.sum=my.sum+fun01(a,b,T,anthrax[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.01,100,1),upper=c(0.1,150,50),likelihood,control = list(fnscale = -1))
+# derived Burr parameters
+result$par
+# derived Burr DI log likelihood
+result$value
+# derived Burr DI AIC
+result$value*-2+6
+
+# we analyse the first salmonella dataset
+# code for producing DI likelihood
+# code for the DI gamma model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(salm1)){
+		my.sum=my.sum+fun01(a,b,salm1[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1))
+# gamma parameters
+result$par
+# gamma DI log likelihood
+result$value
+# gamma DI AIC
+result$value*-2+4
+
+# code for DI Burr III model
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.1 <- function(c,k,t,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.2 <- function(c,k,t,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,t,S){ifelse(S!=1,fun01.2(c,k,t,S),fun01.1(c,k,t,S))}
+likelihood <- function(z){
+	c <- z[1]
+	k <- z[2]
+	t <- z[3]
+	for (i in 1:length(salm1)){
+		my.sum=my.sum+fun01(c,k,t,salm1[i])
+		} 
+	return(my.sum)
+	}
+result <- optim(c(c=11,k=11,t=11),lower=c(0.4,0.1,0.5),upper=c(100,100,100),likelihood,control = list(fnscale = -1))
+# Burr III parameters
+result$par
+# Burr III DI log likelihood
+result$value
+# Burr III DI AIC
+result$value*-2+6
+
+# code for DI Burr X model
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.1 <- function(c,k,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.2 <- function(c,k,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,S){ifelse(S!=1,fun01.2(c,k,S),fun01.1(c,k,S))}
+likelihood <- function(y){
+	c <- y[1]
+	k <- y[2]
+	for (i in 1:length(salm1)){
+		my.sum=my.sum+fun01(c,k,salm1[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(c=1,k=1),lower=c(5,0.5),upper=c(25,50,50),likelihood,control = list(fnscale = -1))
+# Burr X parameters
+result$par
+# Burr X DI log likelihood
+result$value
+# Burr X DI AIC
+result$value*-2+4
+
+# code for DI Burr XII model
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.1 <- function(c,k,s,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.2 <- function(c,k,s,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,s,S){ifelse(S!=1,fun01.2(c,k,s,S),fun01.1(c,k,s,S))}
+likelihood <- function(y){
+	c <- y[1]
+	k <- y[2]
+	s <- y[3]
+	for (i in 1:length(salm1)){
+		my.sum=my.sum+fun01(c,k,s,salm1[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(c=2.1,k=2.5,s=1.1),lower=c(1,1.5,1),upper=c(9,250,250),likelihood,control = list(fnscale = -1))
+# Burr XII parameters
+result$par
+# Burr XII DI log likelihood
+result$value
+# Burr XII DI AIC
+result$value*-2+6
+
+# code for derived Burr model
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
+likelihood <- function(y){
+	a <- y[1]
+	b <- y[2]
+	T <- y[3]
+	for (i in 1:length(salm1)){
+		my.sum=my.sum+fun01(a,b,T,salm1[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.01,3,1),upper=c(0.5,75,50),likelihood,control = list(fnscale = -1))
+# derived Burr parameters
+result$par
+# derived Burr DI log likelihood
+result$value
+# derived Burr DI AIC
+result$value*-2+6
+
+# we analyse the second salmonella dataset
+# code for producing DI likelihood
+# code for the DI gamma model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(salm2)){
+		my.sum=my.sum+fun01(a,b,salm2[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1))
+# gamma parameters
+result$par
+# gamma DI log likelihood
+result$value
+# gamma DI AIC
+result$value*-2+4
+
+# code for DI Burr III model
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.1 <- function(c,k,t,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.2 <- function(c,k,t,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,t,S){ifelse(S!=1,fun01.2(c,k,t,S),fun01.1(c,k,t,S))}
+likelihood <- function(z){
+	c <- z[1]
+	k <- z[2]
+	t <- z[3]
+	for (i in 1:length(salm2)){
+		my.sum=my.sum+fun01(c,k,t,salm2[i])
+		} 
+	return(my.sum)
+	}
+result <- optim(c(c=11,k=11,t=11),lower=c(0.4,0.1,0.5),upper=c(100,100,100),likelihood,control = list(fnscale = -1))
+# Burr III parameters
+result$par
+# Burr III DI log likelihood
+result$value
+# Burr III DI AIC
+result$value*-2+6
+
+# code for DI Burr X model
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.1 <- function(c,k,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.2 <- function(c,k,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,S){ifelse(S!=1,fun01.2(c,k,S),fun01.1(c,k,S))}
+likelihood <- function(y){
+	c <- y[1]
+	k <- y[2]
+	for (i in 1:length(salm2)){
+		my.sum=my.sum+fun01(c,k,salm2[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(c=1,k=1),lower=c(5,0.5),upper=c(25,50,50),likelihood,control = list(fnscale = -1))
+# Burr X parameters
+result$par
+# Burr X DI log likelihood
+result$value
+# Burr X DI AIC
+result$value*-2+4
+
+# code for DI Burr XII model
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.1 <- function(c,k,s,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.2 <- function(c,k,s,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,s,S){ifelse(S!=1,fun01.2(c,k,s,S),fun01.1(c,k,s,S))}
+likelihood <- function(y){
+	c <- y[1]
+	k <- y[2]
+	s <- y[3]
+	for (i in 1:length(salm2)){
+		my.sum=my.sum+fun01(c,k,s,salm2[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(c=2.1,k=2.5,s=1.1),lower=c(1,1.5,1),upper=c(9,100,100),likelihood,control = list(fnscale = -1))
+# Burr XII parameters
+result$par
+# Burr XII DI log likelihood
+result$value
+# Burr XII DI AIC
+result$value*-2+6
+
+# code for derived Burr model
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
+likelihood <- function(y){
+	a <- y[1]
+	b <- y[2]
+	T <- y[3]
+	for (i in 1:length(salm2)){
+		my.sum=my.sum+fun01(a,b,T,salm2[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.01,3,1),upper=c(0.5,75,50),likelihood,control = list(fnscale = -1))
+# derived Burr parameters
+result$par
+# derived Burr DI log likelihood
+result$value
+# derived Burr DI AIC
+result$value*-2+6
+
+# we analyse the third salmonella dataset
+# code for producing DI likelihood
+# code for the DI gamma model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(salm3)){
+		my.sum=my.sum+fun01(a,b,salm3[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1))
+# gamma parameters
+result$par
+# gamma DI log likelihood
+result$value
+# gamma DI AIC
+result$value*-2+4
+
+# code for DI Burr III model
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.1 <- function(c,k,t,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.2 <- function(c,k,t,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,t,S){ifelse(S!=1,fun01.2(c,k,t,S),fun01.1(c,k,t,S))}
+likelihood <- function(z){
+	c <- z[1]
+	k <- z[2]
+	t <- z[3]
+	for (i in 1:length(salm3)){
+		my.sum=my.sum+fun01(c,k,t,salm3[i])
+		} 
+	return(my.sum)
+	}
+result <- optim(c(c=11,k=11,t=11),lower=c(0.4,0.1,0.5),upper=c(100,100,100),likelihood,control = list(fnscale = -1))
+# Burr III parameters
+result$par
+# Burr III DI log likelihood
+result$value
+# Burr III DI AIC
+result$value*-2+6
+
+# code for DI Burr X model
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.1 <- function(c,k,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.2 <- function(c,k,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,S){ifelse(S!=1,fun01.2(c,k,S),fun01.1(c,k,S))}
+likelihood <- function(y){
+	c <- y[1]
+	k <- y[2]
+	for (i in 1:length(salm3)){
+		my.sum=my.sum+fun01(c,k,salm3[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(c=1,k=1),lower=c(5,0.5),upper=c(25,50,50),likelihood,control = list(fnscale = -1))
+# Burr X parameters
+result$par
+# Burr X DI log likelihood
+result$value
+# Burr X DI AIC
+result$value*-2+4
+
+# code for DI Burr XII model
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.1 <- function(c,k,s,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.2 <- function(c,k,s,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,s,S){ifelse(S!=1,fun01.2(c,k,s,S),fun01.1(c,k,s,S))}
+likelihood <- function(y){
+	c <- y[1]
+	k <- y[2]
+	s <- y[3]
+	for (i in 1:length(salm3)){
+		my.sum=my.sum+fun01(c,k,s,salm3[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(c=2.1,k=2.5,s=1.1),lower=c(1,1.15,5),upper=c(9,75,75),likelihood,control = list(fnscale = -1))
+# Burr XII parameters
+result$par
+# Burr XII DI log likelihood
+result$value
+# Burr XII DI AIC
+result$value*-2+6
+
+# code for derived Burr model
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
+likelihood <- function(y){
+	a <- y[1]
+	b <- y[2]
+	T <- y[3]
+	for (i in 1:length(salm3)){
+		my.sum=my.sum+fun01(a,b,T,salm3[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.01,3,1),upper=c(0.5,1000,50),likelihood,control = list(fnscale = -1))
+# derived Burr parameters
+result$par
+# derived Burr DI log likelihood
+result$value
+# derived Burr DI AIC
+result$value*-2+6
+
+# we analyse the fourth salmonella dataset
+# code for producing DI likelihood
+# code for the DI gamma model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(salm4)){
+		my.sum=my.sum+fun01(a,b,salm4[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1))
+# gamma parameters
+result$par
+# gamma DI log likelihood
+result$value
+# gamma DI AIC
+result$value*-2+4
+
+# code for DI Burr III model
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.1 <- function(c,k,t,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.2 <- function(c,k,t,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,t,S){ifelse(S!=1,fun01.2(c,k,t,S),fun01.1(c,k,t,S))}
+likelihood <- function(z){
+	c <- z[1]
+	k <- z[2]
+	t <- z[3]
+	for (i in 1:length(salm4)){
+		my.sum=my.sum+fun01(c,k,t,salm4[i])
+		} 
+	return(my.sum)
+	}
+result <- optim(c(c=11,k=11,t=11),lower=c(0.4,0.1,0.5),upper=c(100,500,100),likelihood,control = list(fnscale = -1))
+# Burr III parameters
+result$par
+# Burr III DI log likelihood
+result$value
+# Burr III DI AIC
+result$value*-2+6
+
+# code for DI Burr X model
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.1 <- function(c,k,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.2 <- function(c,k,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,S){ifelse(S!=1,fun01.2(c,k,S),fun01.1(c,k,S))}
+likelihood <- function(y){
+	c <- y[1]
+	k <- y[2]
+	for (i in 1:length(salm4)){
+		my.sum=my.sum+fun01(c,k,salm4[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(c=1,k=1),lower=c(5,0.5),upper=c(25,50,50),likelihood,control = list(fnscale = -1))
+# Burr X parameters
+result$par
+# Burr X DI log likelihood
+result$value
+# Burr X DI AIC
+result$value*-2+4
+
+# code for DI Burr XII model
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.1 <- function(c,k,s,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.2 <- function(c,k,s,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,s,S){ifelse(S!=1,fun01.2(c,k,s,S),fun01.1(c,k,s,S))}
+likelihood <- function(y){
+	c <- y[1]
+	k <- y[2]
+	s <- y[3]
+	for (i in 1:length(salm4)){
+		my.sum=my.sum+fun01(c,k,s,salm4[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(c=2.1,k=2.5,s=1.1),lower=c(1,1.15,2),upper=c(9,75,75),likelihood,control = list(fnscale = -1))
+# Burr XII parameters
+result$par
+# Burr XII DI log likelihood
+result$value
+# Burr XII DI AIC
+result$value*-2+6
+
+# code for derived Burr model
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
+likelihood <- function(y){
+	a <- y[1]
+	b <- y[2]
+	T <- y[3]
+	for (i in 1:length(salm4)){
+		my.sum=my.sum+fun01(a,b,T,salm4[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.01,3,1),upper=c(0.5,1000,50),likelihood,control = list(fnscale = -1))
+# derived Burr parameters
+result$par
+# derived Burr DI log likelihood
+result$value
+# derived Burr DI AIC
+result$value*-2+6
+
+# we analyse the first campylobacteriosis dataset
+# code for producing DI likelihood
+# code for the DI gamma model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(camp1)){
+		my.sum=my.sum+fun01(a,b,camp1[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1))
+# gamma parameters
+result$par
+# gamma DI log likelihood
+result$value
+# gamma DI AIC
+result$value*-2+4
+
+# code for DI Burr III model
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.1 <- function(c,k,t,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.2 <- function(c,k,t,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,t,S){ifelse(S!=1,fun01.2(c,k,t,S),fun01.1(c,k,t,S))}
+likelihood <- function(z){
+	c <- z[1]
+	k <- z[2]
+	t <- z[3]
+	for (i in 1:length(camp1)){
+		my.sum=my.sum+fun01(c,k,t,camp1[i])
+		} 
+	return(my.sum)
+	}
+result <- optim(c(c=11,k=11,t=11),lower=c(0.4,0.1,0.5),upper=c(100,500,100),likelihood,control = list(fnscale = -1))
+# Burr III parameters
+result$par
+# Burr III DI log likelihood
+result$value
+# Burr III DI AIC
+result$value*-2+6
+
+# code for DI Burr X model
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.1 <- function(c,k,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.2 <- function(c,k,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,S){ifelse(S!=1,fun01.2(c,k,S),fun01.1(c,k,S))}
+likelihood <- function(y){
+	c <- y[1]
+	k <- y[2]
+	for (i in 1:length(camp1)){
+		my.sum=my.sum+fun01(c,k,camp1[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(c=1,k=1),lower=c(2,0.4),upper=c(10,10),likelihood,control = list(fnscale = -1))
+# Burr X parameters
+result$par
+# Burr X DI log likelihood
+result$value
+# Burr X DI AIC
+result$value*-2+4
+
+# code for DI Burr XII model
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.1 <- function(c,k,s,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.2 <- function(c,k,s,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,s,S){ifelse(S!=1,fun01.2(c,k,s,S),fun01.1(c,k,s,S))}
+likelihood <- function(y){
+	c <- y[1]
+	k <- y[2]
+	s <- y[3]
+	for (i in 1:length(camp1)){
+		my.sum=my.sum+fun01(c,k,s,camp1[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(c=2.1,k=2.5,s=1.1),lower=c(1,1.15,2),upper=c(9,75,75),likelihood,control = list(fnscale = -1))
+# Burr XII parameters
+result$par
+# Burr XII DI log likelihood
+result$value
+# Burr XII DI AIC
+result$value*-2+6
+
+# code for derived Burr model
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
+likelihood <- function(y){
+	a <- y[1]
+	b <- y[2]
+	T <- y[3]
+	for (i in 1:length(camp1)){
+		my.sum=my.sum+fun01(a,b,T,camp1[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.5,1,1),upper=c(2,3,3),likelihood,control = list(fnscale = -1))
+# derived Burr parameters
+result$par
+# derived Burr DI log likelihood
+result$value
+# derived Burr DI AIC
+result$value*-2+6
+
+# we analyse the second campylobacteriosis dataset
+# code for producing DI likelihood
+# code for the DI gamma model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(camp2)){
+		my.sum=my.sum+fun01(a,b,camp2[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1))
+# gamma parameters
+result$par
+# gamma DI log likelihood
+result$value
+# gamma DI AIC
+result$value*-2+4
+
+# code for DI Burr III model
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.1 <- function(c,k,t,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.2 <- function(c,k,t,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,t,S){ifelse(S!=1,fun01.2(c,k,t,S),fun01.1(c,k,t,S))}
+likelihood <- function(z){
+	c <- z[1]
+	k <- z[2]
+	t <- z[3]
+	for (i in 1:length(camp2)){
+		my.sum=my.sum+fun01(c,k,t,camp2[i])
+		} 
+	return(my.sum)
+	}
+result <- optim(c(c=11,k=11,t=11),lower=c(0.4,0.1,0.5),upper=c(100,500,100),likelihood,control = list(fnscale = -1))
+# Burr III parameters
+result$par
+# Burr III DI log likelihood
+result$value
+# Burr III DI AIC
+result$value*-2+6
+
+# code for DI Burr X model
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.1 <- function(c,k,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.2 <- function(c,k,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,S){ifelse(S!=1,fun01.2(c,k,S),fun01.1(c,k,S))}
+likelihood <- function(y){
+	c <- y[1]
+	k <- y[2]
+	for (i in 1:length(camp2)){
+		my.sum=my.sum+fun01(c,k,camp2[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(c=1,k=1),lower=c(2,0.4),upper=c(10,10),likelihood,control = list(fnscale = -1))
+# Burr X parameters
+result$par
+# Burr X DI log likelihood
+result$value
+# Burr X DI AIC
+result$value*-2+4
+
+# code for DI Burr XII model
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.1 <- function(c,k,s,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.2 <- function(c,k,s,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,s,S){ifelse(S!=1,fun01.2(c,k,s,S),fun01.1(c,k,s,S))}
+likelihood <- function(y){
+	c <- y[1]
+	k <- y[2]
+	s <- y[3]
+	for (i in 1:length(camp2)){
+		my.sum=my.sum+fun01(c,k,s,camp2[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(c=2.1,k=2.5,s=1.1),lower=c(1,1.15,2),upper=c(9,75,75),likelihood,control = list(fnscale = -1))
+# Burr XII parameters
+result$par
+# Burr XII DI log likelihood
+result$value
+# Burr XII DI AIC
+result$value*-2+6
+
+# code for derived Burr model
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
+likelihood <- function(y){
+	a <- y[1]
+	b <- y[2]
+	T <- y[3]
+	for (i in 1:length(camp2)){
+		my.sum=my.sum+fun01(a,b,T,camp2[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.2,1,1),upper=c(2,10,5),likelihood,control = list(fnscale = -1))
+# derived Burr parameters
+result$par
+# derived Burr DI log likelihood
+result$value
+# derived Burr DI AIC
+result$value*-2+6
+
+# we analyse the third campylobacteriosis dataset
+# code for producing DI likelihood
+# code for the DI gamma model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(camp3)){
+		my.sum=my.sum+fun01(a,b,camp3[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1))
+# gamma parameters
+result$par
+# gamma DI log likelihood
+result$value
+# gamma DI AIC
+result$value*-2+4
+
+# code for DI Burr III model
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.1 <- function(c,k,t,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.2 <- function(c,k,t,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,t,S){ifelse(S!=1,fun01.2(c,k,t,S),fun01.1(c,k,t,S))}
+likelihood <- function(z){
+	c <- z[1]
+	k <- z[2]
+	t <- z[3]
+	for (i in 1:length(camp3)){
+		my.sum=my.sum+fun01(c,k,t,camp3[i])
+		} 
+	return(my.sum)
+	}
+result <- optim(c(c=11,k=11,t=11),lower=c(0.4,0.1,0.5),upper=c(100,500,100),likelihood,control = list(fnscale = -1))
+# Burr III parameters
+result$par
+# Burr III DI log likelihood
+result$value
+# Burr III DI AIC
+result$value*-2+6
+
+# code for DI Burr X model
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.1 <- function(c,k,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.2 <- function(c,k,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,S){ifelse(S!=1,fun01.2(c,k,S),fun01.1(c,k,S))}
+likelihood <- function(y){
+	c <- y[1]
+	k <- y[2]
+	for (i in 1:length(camp3)){
+		my.sum=my.sum+fun01(c,k,camp3[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(c=1,k=1),lower=c(2,0.4),upper=c(10,10),likelihood,control = list(fnscale = -1))
+# Burr X parameters
+result$par
+# Burr X DI log likelihood
+result$value
+# Burr X DI AIC
+result$value*-2+4
+
+# code for DI Burr XII model
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.1 <- function(c,k,s,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.2 <- function(c,k,s,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,s,S){ifelse(S!=1,fun01.2(c,k,s,S),fun01.1(c,k,s,S))}
+likelihood <- function(y){
+	c <- y[1]
+	k <- y[2]
+	s <- y[3]
+	for (i in 1:length(camp3)){
+		my.sum=my.sum+fun01(c,k,s,camp3[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(c=2.1,k=2.5,s=1.1),lower=c(1,1.15,2),upper=c(9,150,150),likelihood,control = list(fnscale = -1))
+# Burr XII parameters
+result$par
+# Burr XII DI log likelihood
+result$value
+# Burr XII DI AIC
+result$value*-2+6
+
+# code for derived Burr model
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
+likelihood <- function(y){
+	a <- y[1]
+	b <- y[2]
+	T <- y[3]
+	for (i in 1:length(camp3)){
+		my.sum=my.sum+fun01(a,b,T,camp3[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.2,1,1),upper=c(2,10,5),likelihood,control = list(fnscale = -1))
+# derived Burr parameters
+result$par
+# derived Burr DI log likelihood
+result$value
+# derived Burr DI AIC
+result$value*-2+6
+
+# we analyse the fourth campylobacteriosis dataset
+# code for producing DI likelihood
+# code for the DI gamma model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(camp4)){
+		my.sum=my.sum+fun01(a,b,camp4[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1))
+# gamma parameters
+result$par
+# gamma DI log likelihood
+result$value
+# gamma DI AIC
+result$value*-2+4
+
+# code for DI Burr III model
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.1 <- function(c,k,t,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.2 <- function(c,k,t,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,t,S){ifelse(S!=1,fun01.2(c,k,t,S),fun01.1(c,k,t,S))}
+likelihood <- function(z){
+	c <- z[1]
+	k <- z[2]
+	t <- z[3]
+	for (i in 1:length(camp4)){
+		my.sum=my.sum+fun01(c,k,t,camp4[i])
+		} 
+	return(my.sum)
+	}
+result <- optim(c(c=11,k=11,t=11),lower=c(0.4,0.1,0.5),upper=c(100,500,100),likelihood,control = list(fnscale = -1))
+# Burr III parameters
+result$par
+# Burr III DI log likelihood
+result$value
+# Burr III DI AIC
+result$value*-2+6
+
+# code for DI Burr X model
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.1 <- function(c,k,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.2 <- function(c,k,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,S){ifelse(S!=1,fun01.2(c,k,S),fun01.1(c,k,S))}
+likelihood <- function(y){
+	c <- y[1]
+	k <- y[2]
+	for (i in 1:length(camp4)){
+		my.sum=my.sum+fun01(c,k,camp4[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(c=1,k=1),lower=c(2,0.4),upper=c(10,10),likelihood,control = list(fnscale = -1))
+# Burr X parameters
+result$par
+# Burr X DI log likelihood
+result$value
+# Burr X DI AIC
+result$value*-2+4
+
+# code for DI Burr XII model
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.1 <- function(c,k,s,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.2 <- function(c,k,s,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,s,S){ifelse(S!=1,fun01.2(c,k,s,S),fun01.1(c,k,s,S))}
+likelihood <- function(y){
+	c <- y[1]
+	k <- y[2]
+	s <- y[3]
+	for (i in 1:length(camp4)){
+		my.sum=my.sum+fun01(c,k,s,camp4[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(c=2.1,k=2.5,s=1.1),lower=c(1,1.15,2),upper=c(9,150,150),likelihood,control = list(fnscale = -1))
+# Burr XII parameters
+result$par
+# Burr XII DI log likelihood
+result$value
+# Burr XII DI AIC
+result$value*-2+6
+
+# code for derived Burr model
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
+likelihood <- function(y){
+	a <- y[1]
+	b <- y[2]
+	T <- y[3]
+	for (i in 1:length(camp4)){
+		my.sum=my.sum+fun01(a,b,T,camp4[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.2,1,1),upper=c(2,200,5),likelihood,control = list(fnscale = -1))
+# derived Burr parameters
+result$par
+# derived Burr DI log likelihood
+result$value
+# derived Burr DI AIC
+result$value*-2+6
+
+# we analyse the fifth campylobacteriosis dataset
+# code for producing DI likelihood
+# code for the DI gamma model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(camp5)){
+		my.sum=my.sum+fun01(a,b,camp5[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1))
+# gamma parameters
+result$par
+# gamma DI log likelihood
+result$value
+# gamma DI AIC
+result$value*-2+4
+
+# code for DI Burr III model
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.1 <- function(c,k,t,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.2 <- function(c,k,t,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,t,S){ifelse(S!=1,fun01.2(c,k,t,S),fun01.1(c,k,t,S))}
+likelihood <- function(z){
+	c <- z[1]
+	k <- z[2]
+	t <- z[3]
+	for (i in 1:length(camp5)){
+		my.sum=my.sum+fun01(c,k,t,camp5[i])
+		} 
+	return(my.sum)
+	}
+result <- optim(c(c=11,k=11,t=11),lower=c(0.4,0.1,0.5),upper=c(100,500,100),likelihood,control = list(fnscale = -1))
+# Burr III parameters
+result$par
+# Burr III DI log likelihood
+result$value
+# Burr III DI AIC
+result$value*-2+6
+
+# code for DI Burr X model
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.1 <- function(c,k,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.2 <- function(c,k,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,S){ifelse(S!=1,fun01.2(c,k,S),fun01.1(c,k,S))}
+likelihood <- function(y){
+	c <- y[1]
+	k <- y[2]
+	for (i in 1:length(camp5)){
+		my.sum=my.sum+fun01(c,k,camp5[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(c=1,k=1),lower=c(2,0.4),upper=c(10,10),likelihood,control = list(fnscale = -1))
+# Burr X parameters
+result$par
+# Burr X DI log likelihood
+result$value
+# Burr X DI AIC
+result$value*-2+4
+
+# code for DI Burr XII model
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.1 <- function(c,k,s,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.2 <- function(c,k,s,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(c,k,s,S){ifelse(S!=1,fun01.2(c,k,s,S),fun01.1(c,k,s,S))}
+likelihood <- function(y){
+	c <- y[1]
+	k <- y[2]
+	s <- y[3]
+	for (i in 1:length(camp5)){
+		my.sum=my.sum+fun01(c,k,s,camp5[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(c=2.1,k=2.5,s=1.1),lower=c(1,1.15,2),upper=c(9,1500,1500),likelihood,control = list(fnscale = -1))
+# Burr XII parameters
+result$par
+# Burr XII DI log likelihood
+result$value
+# Burr XII DI AIC
+result$value*-2+6
+
+# code for derived Burr model
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
+likelihood <- function(y){
+	a <- y[1]
+	b <- y[2]
+	T <- y[3]
+	for (i in 1:length(camp5)){
+		my.sum=my.sum+fun01(a,b,T,camp5[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.2,0.5,1),upper=c(2,200,5),likelihood,control = list(fnscale = -1))
+# derived Burr parameters
+result$par
+# derived Burr DI log likelihood
+result$value
+# derived Burr DI AIC
+result$value*-2+6
