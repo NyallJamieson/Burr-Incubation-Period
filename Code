@@ -2781,4 +2781,239 @@ lines(x,burr12_aic,col=4)
 lines(x,burrD_aic,col=7)
 legend("bottomright",legend=c("Type III","Type X","Type XII", "Derived Burr"),col=c(2,3,4,7),lty=1, cex=0.8)
 
+# simulation 2 code
+# first varying alpha simulation
+aa <- 0.474 
+bb <- 1.857
+TT <- 5.075
+
+a_vec <- c()
+props_vec_ml <- c()
+props_vec_aic <- c()
+
+for (i in seq(from=0.3,to=10,by=0.1)){
+print(i)
+a_vec <- append(a_vec,i)
+score_ml <- 0
+score_aic <- 0
+
+for (times in 1:50){
+print(times)
+Samp <- runif(n=100)
+A <- function(u,x){(1+(TT/x)^(i*bb)*exp(i*(TT-x)))^(-1)-u}
+Uni <- function(z){uniroot(A,c(1e-30,100000),u=z)$root}
+Samples <- lapply(Samp,Uni)
+Samples <- unlist(Samples)
+MelbourneIP <- ceiling(Samples)
+
+# Gamma
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1,subdivisions=2000,abs.tol = 0L)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1,subdivisions=2000,abs.tol = 0L)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+               a <- z[1]
+               b <- z[2]
+               for (i in 1:length(MelbourneIP)){
+                              my.sum=my.sum+fun01(a,b,MelbourneIP[i])
+                              }
+               return(my.sum)
+               }
+result1 <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1))
+
+# Derived Burr
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
+likelihood <- function(y){
+               a <- y[1]
+               b <- y[2]
+               T <- y[3]
+               for (i in 1:length(MelbourneIP)){
+                              my.sum=my.sum+fun01(a,b,T,MelbourneIP[i])
+               }
+               return(my.sum)
+}
+result5 <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.1,0.9,1),upper=c(9,35,10),likelihood,control = list(fnscale = -1))
+
+if (result5$value>result1$value){
+score_ml <- score_ml+1
+}
+if (result5$value>result1$value+1){
+score_aic <- score_aic+1
+}
+}
+props_vec_ml <- append(props_vec_ml,score_ml/50)
+props_vec_aic <- append(props_vec_aic,score_ml/50)
+print(props_vec_ml)
+print(props_vec_aic)
+}
+
+# now varying beta simulation
+aa <- 0.474 
+bb <- 1.857
+TT <- 5.075
+
+b_vec <- c()
+props_vec_ml <- c()
+props_vec_aic <- c()
+
+for (i in seq(from=0.2,to=10,by=0.1)){
+print(i)
+b_vec <- append(b_vec,i)
+score_ml <- 0
+score_aic <- 0
+
+for (times in 1:50){
+print(times)
+Samp <- runif(n=100)
+A <- function(u,x){(1+(TT/x)^(aa*i)*exp(aa*(TT-x)))^(-1)-u}
+Uni <- function(z){uniroot(A,c(1e-30,100000),u=z)$root}
+Samples <- lapply(Samp,Uni)
+Samples <- unlist(Samples)
+MelbourneIP <- ceiling(Samples)
+
+# Gamma
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1,subdivisions=2000,abs.tol = 0L)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1,subdivisions=2000,abs.tol = 0L)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+               a <- z[1]
+               b <- z[2]
+               for (i in 1:length(MelbourneIP)){
+                              my.sum=my.sum+fun01(a,b,MelbourneIP[i])
+                              }
+               return(my.sum)
+               }
+result1 <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1))
+
+# Derived Burr
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
+likelihood <- function(y){
+               a <- y[1]
+               b <- y[2]
+               T <- y[3]
+               for (i in 1:length(MelbourneIP)){
+                              my.sum=my.sum+fun01(a,b,T,MelbourneIP[i])
+               }
+               return(my.sum)
+}
+result5 <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.1,0.9,1),upper=c(9,35,10),likelihood,control = list(fnscale = -1))
+
+if (result5$value>result1$value){
+score_ml <- score_ml+1
+}
+if (result5$value>result1$value+1){
+score_aic <- score_aic+1
+}
+}
+props_vec_ml <- append(props_vec_ml,score_ml/50)
+props_vec_aic <- append(props_vec_aic,score_ml/50)
+print(props_vec_ml)
+print(props_vec_aic)
+}
+
+# now varying T simulation
+aa <- 0.474 
+bb <- 1.857
+TT <- 5.075
+
+T_vec <- c()
+props_vec_ml <- c()
+props_vec_aic <- c()
+
+for (i in seq(from=2,to=30,by=0.5)){
+print(i)
+T_vec <- append(T_vec,i)
+score_ml <- 0
+score_aic <- 0
+
+for (times in 1:50){
+print(times)
+Samp <- runif(n=100)
+A <- function(u,x){(1+(i/x)^(aa*bb)*exp(aa*(i-x)))^(-1)-u}
+Uni <- function(z){uniroot(A,c(1e-30,100000),u=z)$root}
+Samples <- lapply(Samp,Uni)
+Samples <- unlist(Samples)
+MelbourneIP <- ceiling(Samples)
+
+# Gamma
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1,subdivisions=2000,abs.tol = 0L)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1,subdivisions=2000,abs.tol = 0L)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+               a <- z[1]
+               b <- z[2]
+               for (i in 1:length(MelbourneIP)){
+                              my.sum=my.sum+fun01(a,b,MelbourneIP[i])
+                              }
+               return(my.sum)
+               }
+result1 <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1))
+
+# Derived Burr
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
+likelihood <- function(y){
+               a <- y[1]
+               b <- y[2]
+               T <- y[3]
+               for (i in 1:length(MelbourneIP)){
+                              my.sum=my.sum+fun01(a,b,T,MelbourneIP[i])
+               }
+               return(my.sum)
+}
+result5 <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.1,0.9,1),upper=c(9,35,10),likelihood,control = list(fnscale = -1))
+
+if (result5$value>result1$value){
+score_ml <- score_ml+1
+}
+if (result5$value>result1$value+1){
+score_aic <- score_aic+1
+}
+}
+props_vec_ml <- append(props_vec_ml,score_ml/50)
+props_vec_aic <- append(props_vec_aic,score_ml/50)
+print(props_vec_ml)
+print(props_vec_aic)
+}
+
 # code for plotting figure 6
+a_vec <- seq(0.3,3,by=0.1)
+a_result <- c(0.88,0.9,0.94,0.92,0.96,0.98,1,0.9,0.84,0.98,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)
+
+b_vec <- seq(0.2,10,by=0.1)
+b_result <- c(1,1,1,1,1,1,1,1,0.98,1,0.98,0.96,0.98,0.96,0.96,0.98,1,0.94,0.94,0.92,0.94,0.94,0.92,0.96,0.9,0.94,0.96,0.9,0.88,0.88,0.96,0.84,0.88,0.88,0.82,0.88,0.92,0.72,0.78,0.74,0.78,0.82,0.8,0.82,0.88,0.88,0.82,0.84,0.76,0.7,0.68,0.74,0.82,0.7,0.78,0.74,0.72,0.74,0.78,0.72,0.74,0.78,0.8,0.84,0.64,0.78,0.7,0.68,0.72,0.72,0.68,0.68,0.74,0.76,0.74,0.7,0.7,0.92,0.8,0.64,0.8,0.8,0.7,0.76,0.78,0.76,0.8,0.66,0.8,0.74,0.68,0.92,0.8,0.7,0.8,0.78,0.7,0.72,0.62)
+
+t_vec <- seq(2,20,by=0.5)
+t_result <- seq(0.9,0.98,0.92,0.98,0.98,0.98,1,0.92,1,0.96,0.98,0.94,0.92,0.96,0.92,0.92,0.9,0.94,0.68,0.3,0.18,0.06,0.02,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+
+plot(a_vec,a_result,type="l",lwd=2,col="red",xlab=expression(alpha),ylab="Proportion")
+plot(b_vec,b_result,type="l",lwd=2,col="green",xlab=expression(beta),ylab="Proportion")
+plot(t_vec,t_result,type="l",lwd=2,col="blue",xlab=T,ylab="Proportion")
