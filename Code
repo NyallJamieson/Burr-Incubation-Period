@@ -2768,18 +2768,18 @@ par(mfrow=c(1,2))
 
 # ML
 x <- c(10,50,100,150,200,250,300,350,400,450,500)
-plot(x,burr3_ml,type="l",xlim=c(50,500),ylim=c(0.50,1.00),col=2,ylab="Proportion",xlab="Size of Data set",main="Bootstrap generated ML")
-lines(x,burr10_ml,col=3)
-lines(x,burr12_ml,col=4)
-lines(x,burrD_ml,col=7)
-legend("bottomright",legend=c("Type III","Type X","Type XII", "Derived Burr"),col=c(2,3,4,7),lty=1, cex=0.8)
+plot(x,burr3_ml,type="l",lwd=2,xlim=c(50,500),ylim=c(0.50,1.00),col=2,ylab="Proportion",xlab="Size of Data set",main="Bootstrap generated ML")
+lines(x,burr10_ml,col=3,lwd=2)
+lines(x,burr12_ml,col=4,lwd=2)
+lines(x,burrD_ml,col=1,lwd=2)
+legend("bottomright",legend=c("Type III","Type X","Type XII", "Derived Burr"),col=c(2,3,4,1),lty=1, cex=0.8)
 
 # AIC
-plot(x,burr3_aic,type="l",xlim=c(50,500),ylim=c(0.50,1.00),col=2,ylab="Proportion",xlab="Size of Data set",main="Bootstrap generated AIC")
-lines(x,burr10_aic,col=3)
-lines(x,burr12_aic,col=4)
-lines(x,burrD_aic,col=7)
-legend("bottomright",legend=c("Type III","Type X","Type XII", "Derived Burr"),col=c(2,3,4,7),lty=1, cex=0.8)
+plot(x,burr3_aic,type="l",lwd=2,xlim=c(50,500),ylim=c(0.50,1.00),col=2,ylab="Proportion",xlab="Size of Data set",main="Bootstrap generated AIC")
+lines(x,burr10_aic,col=3,lwd=2)
+lines(x,burr12_aic,col=4,lwd=2)
+lines(x,burrD_aic,col=1,lwd=2)
+legend("bottomright",legend=c("Type III","Type X","Type XII", "Derived Burr"),col=c(2,3,4,1),lty=1, cex=0.8)
 
 # simulation 2 code
 # first varying alpha simulation
