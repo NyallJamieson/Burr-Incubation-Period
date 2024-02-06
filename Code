@@ -3014,6 +3014,6 @@ b_result <- c(1,1,1,1,1,1,1,1,0.98,1,0.98,0.96,0.98,0.96,0.96,0.98,1,0.94,0.94,0
 t_vec <- seq(2,20,by=0.5)
 t_result <- c(0.9,0.98,0.92,0.98,0.98,0.98,1,0.92,1,0.96,0.98,0.94,0.92,0.96,0.92,0.92,0.9,0.94,0.68,0.3,0.18,0.06,0.02,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
 
-plot(a_vec,a_result,type="l",lwd=3,col="red",xlab=expression(alpha),ylab="Proportion",cex=1.5)
-plot(b_vec,b_result,type="l",lwd=3,col="green",xlab=expression(beta),ylab="Proportion",cex=1.5)
-plot(t_vec,t_result,type="l",lwd=3,col="blue",xlab=T,ylab="Proportion",cex=1.5)
+plot(a_vec,a_result,type="l",lwd=3,col="red",xlab=expression(alpha),ylab="Proportion",cex.lab=1.5)
+plot(b_vec,b_result,type="l",lwd=3,col="green",xlab=expression(beta),ylab="Proportion",cex.lab=1.5)
+plot(t_vec,t_result,type="l",lwd=3,col="blue",xlab=expression(T),ylab="Proportion",cex.lab=1.5)
