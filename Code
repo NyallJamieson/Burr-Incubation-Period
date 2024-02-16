@@ -2851,7 +2851,7 @@ score_aic <- score_aic+1
 }
 }
 props_vec_ml <- append(props_vec_ml,score_ml/50)
-props_vec_aic <- append(props_vec_aic,score_ml/50)
+props_vec_aic <- append(props_vec_aic,score_aic/50)
 print(props_vec_ml)
 print(props_vec_aic)
 }
@@ -2925,7 +2925,7 @@ score_aic <- score_aic+1
 }
 }
 props_vec_ml <- append(props_vec_ml,score_ml/50)
-props_vec_aic <- append(props_vec_aic,score_ml/50)
+props_vec_aic <- append(props_vec_aic,score_aic/50)
 print(props_vec_ml)
 print(props_vec_aic)
 }
@@ -2999,7 +2999,7 @@ score_aic <- score_aic+1
 }
 }
 props_vec_ml <- append(props_vec_ml,score_ml/50)
-props_vec_aic <- append(props_vec_aic,score_ml/50)
+props_vec_aic <- append(props_vec_aic,score_aic/50)
 print(props_vec_ml)
 print(props_vec_aic)
 }
