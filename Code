@@ -125,13 +125,15 @@ likelihood <- function(z){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1))
+result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # gamma parameters
 result$par
 # gamma DI log likelihood
 result$value
 # gamma DI AIC
 result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
 
 # code for DI Burr III model
 fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
@@ -150,13 +152,15 @@ likelihood <- function(z){
 		} 
 	return(my.sum)
 	}
-result <- optim(c(c=11,k=11,t=11),lower=c(0.4,0.1,0.5),upper=c(100,100,100),likelihood,control = list(fnscale = -1))
+result <- optim(c(c=11,k=11,t=11),lower=c(0.4,0.1,0.5),upper=c(100,100,100),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # Burr III parameters
 result$par
 # Burr III DI log likelihood
 result$value
 # Burr III DI AIC
 result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
 
 # code for DI Burr X model
 fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
@@ -174,13 +178,15 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(c=1,k=1),lower=c(0.2,0.9),upper=c(9,50,50),likelihood,control = list(fnscale = -1))
+result <- optim(c(c=1,k=1),lower=c(0.2,0.9),upper=c(9,50,50),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # Burr X parameters
 result$par
 # Burr X DI log likelihood
 result$value
 # Burr X DI AIC
 result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
 
 # code for DI Burr XII model
 fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
@@ -199,19 +205,21 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(c=2.1,k=2.5,s=1.1),lower=c(1,1.9,1),upper=c(9,50,50),likelihood,control = list(fnscale = -1))
+result <- optim(c(c=2.1,k=2.5,s=1.1),lower=c(1,1.9,1),upper=c(9,50,50),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # Burr XII parameters
 result$par
 # Burr XII DI log likelihood
 result$value
 # Burr XII DI AIC
 result$value*-2+6
+# standard errors
+hess <- diag(inv(-result$hessian))
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -224,13 +232,15 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.1,0.1,1),upper=c(9,50,50),likelihood,control = list(fnscale = -1))
+result <- optim(c(a=0.5,b=1.5,T=1.1),lower=c(0.1,0.1,1),upper=c(3,5,25),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
 result$value
 # derived Burr DI AIC
 result$value*-2+6
+# standard errors
+hess <- diag(inv(-result$hessian))
 # Output for these DI log likelihood fitting provides values given in tables 4 and 5
 
 # code for bootstrapping confidence intervals of the mean for each model, for table 6
