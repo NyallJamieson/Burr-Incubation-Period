@@ -548,10 +548,10 @@ result$value
 result$value*-2+6
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -564,13 +564,15 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.01,100,1),upper=c(0.1,150,50),likelihood,control = list(fnscale = -1))
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.0001,1,1),upper=c(0.1,10,50),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
 result$value
 # derived Burr DI AIC
 result$value*-2+6
+# standard errors
+hess <- diag(inv(-result$hessian))
 
 # we analyse the first salmonella dataset
 # code for producing DI likelihood
@@ -673,10 +675,10 @@ result$value
 result$value*-2+6
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -689,13 +691,14 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.01,3,1),upper=c(0.5,75,50),likelihood,control = list(fnscale = -1))
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.01,1,1),upper=c(0.5,75,50),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
 result$value
 # derived Burr DI AIC
 result$value*-2+6
+hess <- diag(inv(-result$hessian))
 
 # we analyse the second salmonella dataset
 # code for producing DI likelihood
@@ -798,10 +801,10 @@ result$value
 result$value*-2+6
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -814,13 +817,14 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.01,3,1),upper=c(0.5,75,50),likelihood,control = list(fnscale = -1))
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.01,1,1),upper=c(0.5,75,50),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
 result$value
 # derived Burr DI AIC
 result$value*-2+6
+hess <- diag(inv(-result$hessian))
 
 # we analyse the third salmonella dataset
 # code for producing DI likelihood
@@ -923,10 +927,10 @@ result$value
 result$value*-2+6
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -939,13 +943,14 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.01,3,1),upper=c(0.5,1000,50),likelihood,control = list(fnscale = -1))
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.0001,1,1),upper=c(0.5,10,50),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
 result$value
 # derived Burr DI AIC
 result$value*-2+6
+hess <- diag(inv(-result$hessian))
 
 # we analyse the fourth salmonella dataset
 # code for producing DI likelihood
@@ -1048,10 +1053,10 @@ result$value
 result$value*-2+6
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -1064,13 +1069,14 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.01,3,1),upper=c(0.5,1000,50),likelihood,control = list(fnscale = -1))
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.01,3,1),upper=c(0.5,1000,50),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
 result$value
 # derived Burr DI AIC
 result$value*-2+6
+hess <- diag(inv(-result$hessian))
 
 # we analyse the first campylobacteriosis dataset
 # code for producing DI likelihood
@@ -1173,10 +1179,10 @@ result$value
 result$value*-2+6
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -1189,13 +1195,14 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.5,1,1),upper=c(2,3,3),likelihood,control = list(fnscale = -1))
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.5,1,1),upper=c(2,3,3),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
 result$value
 # derived Burr DI AIC
 result$value*-2+6
+hess <- diag(inv(-result$hessian))
 
 # we analyse the second campylobacteriosis dataset
 # code for producing DI likelihood
@@ -1298,10 +1305,10 @@ result$value
 result$value*-2+6
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -1314,13 +1321,14 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.2,1,1),upper=c(2,10,5),likelihood,control = list(fnscale = -1))
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.1,1,1),upper=c(2,10,5),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
 result$value
 # derived Burr DI AIC
 result$value*-2+6
+hess <- diag(inv(-result$hessian))
 
 # we analyse the third campylobacteriosis dataset
 # code for producing DI likelihood
@@ -1423,10 +1431,10 @@ result$value
 result$value*-2+6
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -1439,13 +1447,14 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.2,1,1),upper=c(2,10,5),likelihood,control = list(fnscale = -1))
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.2,1,1),upper=c(2,10,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
 result$value
 # derived Burr DI AIC
 result$value*-2+6
+hess <- diag(inv(-result$hessian))
 
 # we analyse the fourth campylobacteriosis dataset
 # code for producing DI likelihood
@@ -1548,10 +1557,10 @@ result$value
 result$value*-2+6
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -1564,13 +1573,14 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.2,1,1),upper=c(2,200,5),likelihood,control = list(fnscale = -1))
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.2,1,1),upper=c(2,20,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
 result$value
 # derived Burr DI AIC
 result$value*-2+6
+hess <- diag(inv(-result$hessian))
 
 # we analyse the fifth campylobacteriosis dataset
 # code for producing DI likelihood
@@ -1673,10 +1683,10 @@ result$value
 result$value*-2+6
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -1689,35 +1699,36 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.2,0.5,1),upper=c(2,200,5),likelihood,control = list(fnscale = -1))
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.2,0.05,1),upper=c(2,20,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
 result$value
 # derived Burr DI AIC
 result$value*-2+6
+hess <- diag(inv(-result$hessian))
 
 
 # we now want to plot each dataset with curve fits from normal maximum likelihood methods as well as the DI likelihood method plotted on top as was done for the legionella data
 # first need to find parameters of distributions when fitting by normal maximum likelihood methods
 # find parameters for anthrax dataset
-fitdist(anthrax,"gamma",method="mle")
-fitdist(anthrax,"burr3",method="mle",start=list(c=1,k=1,s=1))
-fitdist(anthrax,"burr10",method="mle",start=list(c=5,k=5))
-fitdist(anthrax,"burr12",method="mle",start=list(c=1,k=10,s=1))
-fitdist(anthrax,"dburr",method="mle",start=list(a=0.3,b=100,T=1))
+summary(fitdist(anthrax,"gamma",method="mle"))
+summary(fitdist(anthrax,"burr3",method="mle",start=list(c=1,k=1,s=1)))
+summary(fitdist(anthrax,"burr10",method="mle",start=list(c=5,k=5)))
+summary(fitdist(anthrax,"burr12",method="mle",start=list(c=1,k=10,s=1)))
+summary(fitdist(anthrax,"burrNEW",method="mle",start=list(a=0.3,b=5,T=1)))
 # find parameters for first salmonellosis dataset
-fitdist(salm1,"gamma",method="mle")
-fitdist(salm1,"burr3",method="mle",start=list(c=1,k=1,s=1))
-fitdist(salm1,"burr10",method="mle",start=list(c=5,k=5))
-fitdist(salm1,"burr12",method="mle",start=list(c=1,k=10,s=1))
-fitdist(salm1,"dburr",method="mle",start=list(a=0.3,b=50,T=1))
+summary(fitdist(salm1,"gamma",method="mle"))
+summary(fitdist(salm1,"burr3",method="mle",start=list(c=1,k=1,s=1)))
+summary(fitdist(salm1,"burr10",method="mle",start=list(c=5,k=5)))
+summary(fitdist(salm1,"burr12",method="mle",start=list(c=1,k=10,s=1)))
+summary(fitdist(salm1,"burrNEW",method="mle",start=list(a=0.3,b=5,T=10)))
 # find parameters for second salmonellosis dataset
 fitdist(salm2,"gamma",method="mle")
 fitdist(salm2,"burr3",method="mle",start=list(c=1,k=1,s=1))
 fitdist(salm2,"burr10",method="mle",start=list(c=5,k=5))
 fitdist(salm2,"burr12",method="mle",start=list(c=1,k=10,s=1))
-fitdist(salm2,"dburr",method="mle",start=list(a=0.3,b=50,T=1))
+fitdist(salm2,"burrNEW",method="mle",start=list(a=0.3,b=50,T=1))
 # find parameters for third salmonellosis dataset
 fitdist(salm3,"gamma",method="mle")
 fitdist(salm3,"burr3",method="mle",start=list(c=1,k=1,s=1))
@@ -1735,31 +1746,31 @@ fitdist(camp1,"gamma",method="mle")
 fitdist(camp1,"burr3",method="mle",start=list(c=1,k=1,s=1))
 fitdist(camp1,"burr10",method="mle",start=list(c=1,k=1))
 fitdist(camp1,"burr12",method="mle",start=list(c=1,k=10,s=1))
-fitdist(camp1,"dburr",method="mle",start=list(a=1,b=1,T=1))
+fitdist(camp1,"burrNEW",method="mle",start=list(a=1,b=1,T=1))
 # find parameters for second campylobacteriosis dataset
 fitdist(camp2,"gamma",method="mle")
 fitdist(camp2,"burr3",method="mle",start=list(c=1,k=1,s=1))
 fitdist(camp2,"burr10",method="mle",start=list(c=1,k=1))
 fitdist(camp2,"burr12",method="mle",start=list(c=1,k=10,s=1))
-fitdist(camp2,"dburr",method="mle",start=list(a=1,b=1,T=1))
+fitdist(camp2,"burrNEW",method="mle",start=list(a=1,b=1,T=1))
 # find parameters for third campylobacteriosis dataset
 fitdist(camp3,"gamma",method="mle")
 fitdist(camp3,"burr3",method="mle",start=list(c=1,k=1,s=1))
 fitdist(camp3,"burr10",method="mle",start=list(c=1,k=1))
 fitdist(camp3,"burr12",method="mle",start=list(c=1,k=10,s=1))
-fitdist(camp3,"dburr",method="mle",start=list(a=1,b=1,T=1))
+fitdist(camp3,"burrNEW",method="mle",start=list(a=1,b=1,T=1))
 # find parameters for fourth campylobacteriosis dataset
 fitdist(camp4,"gamma",method="mle")
 fitdist(camp4,"burr3",method="mle",start=list(c=1,k=1,s=1))
 fitdist(camp4,"burr10",method="mle",start=list(c=1,k=1))
 fitdist(camp4,"burr12",method="mle",start=list(c=1,k=10,s=1))
-fitdist(camp4,"dburr",method="mle",start=list(a=1,b=1,T=1))
+fitdist(camp4,"burrNEW",method="mle",start=list(a=1,b=1,T=1))
 # find parameters for fifth campylobacteriosis dataset
 fitdist(camp5,"gamma",method="mle")
 fitdist(camp5,"burr3",method="mle",start=list(c=1,k=1,s=1))
 fitdist(camp5,"burr10",method="mle",start=list(c=1,k=1))
 fitdist(camp5,"burr12",method="mle",start=list(c=1,k=10,s=1))
-fitdist(camp5,"dburr",method="mle",start=list(a=1,b=1,T=1))
+fitdist(camp5,"burrNEW",method="mle",start=list(a=1,b=1,T=1))
 
 we now produce plots like figure 4, but for the other disease datasets used in analysis
 # code for each is provided below
