@@ -2888,7 +2888,7 @@ b_vec <- c()
 props_vec_ml <- c()
 props_vec_aic <- c()
 
-for (i in seq(from=0.2,to=10,by=0.1)){
+for (i in seq(0.1,6,by=0.1)/aa){
 print(i)
 b_vec <- append(b_vec,i)
 score_ml <- 0
