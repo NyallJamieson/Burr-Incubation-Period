@@ -3038,6 +3038,108 @@ b_aic <- c(1,1,0.98,1,0.98,1,0.9,0.92,0.76,0.84,0.82,0.76,0.78,0.74,0.74,0.58,0.
 t_vec <- seq(2,20,by=0.5)
 t_result <- c(0.9,0.98,0.92,0.98,0.98,0.98,1,0.92,1,0.96,0.98,0.94,0.92,0.96,0.92,0.92,0.9,0.94,0.68,0.3,0.18,0.06,0.02,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
 
+
+# simulation 3 code and plotting for figure 7
+shape <- seq(0.5,20,by=0.1)
+mean <- seq(1,20,by=0.1)
+alpha <- c()
+beta <- c()
+T <- c()
+beats <- c()
+diffAverage <- c()
+#diffRate <- c()
+#diffShape <- c()
+
+for (i in shape){
+print(i)
+for (j in mean){
+# print(j)
+
+data <- rgamma(n=1000,shape=i,rate=i/j)
+gam <- fitdist(data,"gamma",method="mle")
+burr <- fitdist(data,"burrNEW",method="mle",start=list(a=i/j,b=5,T=median(data)))
+
+if (summary(burr)$estim[1]<0 | summary(burr)$estim[2]<0){
+fun <- function(a,b,T,x){log(a*(x+b))+(a*b)*log(T/x)+(a*(T-x))-log(x)-2*log(1+(T/x)^(a*b)*exp(a*(T-x)))}
+likelihood <- function(z){
+my.sum <- 0
+a <- z[1]
+b <- z[2]
+T <- z[3]
+for (i in 1:length(data)){
+      my.sum=my.sum+fun(a,b,T,data[i])
+      }
+return(my.sum)
+}
+result1 <- optim(c(a=1,b=1,T=1),lower=c(0.01,0.1,0.5*median(data)),upper=c(1,500,1.5*median(data)),likelihood,control = list(fnscale = -1))
+alpha <- append(alpha,result1$par[1])
+beta <- append(beta,result1$par[1]*result1$par[2])
+T <- append(T,result1$par[3])
+diffAverage <- append(diffAverage,abs(j-result1$par[3]))
+#diffRate <- append(diffRate,i/j-result1$par[1])
+#diffShape <- append(diffShape,i-result1$par[1]*result1$par[2])
+} else {
+alpha <- append(alpha,summary(burr)$estim[1])
+beta <- append(beta,summary(burr)$estim[2])
+T <- append(T,summary(burr)$estim[3])
+diffAverage <- append(diffAverage,abs(j-summary(burr)$estim[3]))
+}
+}
+}
+
+
+
+data <- expand.grid(X=mean,Y=shape)
+data$Z <- T
+ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
+  geom_raster() +
+  scale_fill_gradientn(colours=rainbow(10)) +
+  scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
+  scale_y_continuous(limits=c(0.5,20), expand = c(0, 0)) +
+  theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=20), axis.title.y=element_text(size=20), legend.title=element_text(size=20)) +
+  labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(T[D])) +
+  coord_fixed()
+print(ggheatmap)
+
+
+data <- expand.grid(X=mean,Y=shape)
+data$Z <- alpha
+ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
+  geom_raster() +
+  scale_fill_gradientn(colours=rainbow(5)) +
+  scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
+  scale_y_continuous(limits=c(0.5,20), expand = c(0, 0)) +
+  theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=20), axis.title.y=element_text(size=20), legend.title=element_text(size=20)) +
+  labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(beta[D])) +
+  coord_fixed()
+print(ggheatmap)
+
+
+data <- expand.grid(X=mean,Y=shape)
+data$Z <- beta
+ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
+  geom_raster() +
+  scale_fill_gradientn(colours=rainbow(6)) +
+  scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
+  scale_y_continuous(limits=c(0.5,20), expand = c(0, 0)) +
+  theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=20), axis.title.y=element_text(size=20), legend.title=element_text(size=20)) +
+  labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(alpha[D])) +
+  coord_fixed()
+print(ggheatmap)
+
+
+data <- expand.grid(X=mean,Y=shape)
+data$Z <- diffAverage
+ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
+  geom_raster() +
+  scale_fill_gradientn(colours=rainbow(5)) +
+  scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
+  scale_y_continuous(limits=c(0.5,20), expand = c(0, 0)) +
+  theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=20), axis.title.y=element_text(size=20), legend.title=element_text(size=20)) +
+  labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(mu[Gamma]-T)) +
+  coord_fixed()
+print(ggheatmap)
+
 plot(a_vec,a_result,type="l",lwd=3,col="red",xlab=expression(alpha),ylab="Proportion",cex.lab=1.5)
 plot(b_vec,b_aic,type="l",lwd=3,col="green",xlab=expression(beta),ylab="Proportion",cex.lab=1.5)
 plot(t_vec,t_result,type="l",lwd=3,col="blue",xlab=expression(T),ylab="Proportion",cex.lab=1.5)
