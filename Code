@@ -3038,8 +3038,12 @@ b_aic <- c(1,1,0.98,1,0.98,1,0.9,0.92,0.76,0.84,0.82,0.76,0.78,0.74,0.74,0.58,0.
 t_vec <- seq(2,20,by=0.5)
 t_result <- c(0.9,0.98,0.92,0.98,0.98,0.98,1,0.92,1,0.96,0.98,0.94,0.92,0.96,0.92,0.92,0.9,0.94,0.68,0.3,0.18,0.06,0.02,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
 
+plot(a_vec,a_result,type="l",lwd=3,col="red",xlab=expression(alpha),ylab="Proportion",cex.lab=1.5)
+plot(b_vec,b_aic,type="l",lwd=3,col="green",xlab=expression(beta),ylab="Proportion",cex.lab=1.5)
+plot(t_vec,t_result,type="l",lwd=3,col="blue",xlab=expression(T),ylab="Proportion",cex.lab=1.5
 
-# simulation 3 code and plotting for figure 7
+
+# simulation 3 code and code to produce the heatmaps in figure 7
 shape <- seq(0.5,20,by=0.1)
 mean <- seq(1,20,by=0.1)
 alpha <- c()
@@ -3093,7 +3097,8 @@ data <- expand.grid(X=mean,Y=shape)
 data$Z <- T
 ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
   geom_raster() +
-  scale_fill_gradientn(colours=rainbow(10)) +
+  scale_fill_gradientn(colours=rainbow(5)) +
+  geom_hline(yintercept=1,linetype="dotted") +
   scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
   scale_y_continuous(limits=c(0.5,20), expand = c(0, 0)) +
   theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=20), axis.title.y=element_text(size=20), legend.title=element_text(size=20)) +
@@ -3107,6 +3112,7 @@ data$Z <- alpha
 ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
   geom_raster() +
   scale_fill_gradientn(colours=rainbow(5)) +
+  geom_hline(yintercept=1,linetype="dotted") +
   scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
   scale_y_continuous(limits=c(0.5,20), expand = c(0, 0)) +
   theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=20), axis.title.y=element_text(size=20), legend.title=element_text(size=20)) +
@@ -3119,7 +3125,8 @@ data <- expand.grid(X=mean,Y=shape)
 data$Z <- beta
 ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
   geom_raster() +
-  scale_fill_gradientn(colours=rainbow(6)) +
+  scale_fill_gradientn(colours=rainbow(5)) +
+  geom_hline(yintercept=1,linetype="dotted") +
   scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
   scale_y_continuous(limits=c(0.5,20), expand = c(0, 0)) +
   theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=20), axis.title.y=element_text(size=20), legend.title=element_text(size=20)) +
@@ -3133,13 +3140,10 @@ data$Z <- diffAverage
 ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
   geom_raster() +
   scale_fill_gradientn(colours=rainbow(5)) +
+  geom_hline(yintercept=1,linetype="dotted") +
   scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
   scale_y_continuous(limits=c(0.5,20), expand = c(0, 0)) +
   theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=20), axis.title.y=element_text(size=20), legend.title=element_text(size=20)) +
   labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(mu[Gamma]-T)) +
   coord_fixed()
 print(ggheatmap)
-
-plot(a_vec,a_result,type="l",lwd=3,col="red",xlab=expression(alpha),ylab="Proportion",cex.lab=1.5)
-plot(b_vec,b_aic,type="l",lwd=3,col="green",xlab=expression(beta),ylab="Proportion",cex.lab=1.5)
-plot(t_vec,t_result,type="l",lwd=3,col="blue",xlab=expression(T),ylab="Proportion",cex.lab=1.5)
