@@ -13,12 +13,12 @@ pburr12 <- function(x,c,k,s){1-(1+(x/s)^(c))^(1-k)}
 # p.d.f of type XII Burr distribution
 dburr12 <- function(x,c,k,s){c*(k-1)*s^(-1)*(1+(x/s)^(c))^(-k)*(x/s)^(c-1)}
 # c.d.f of our derived Burr distribution
-pdburr <- function(x,a,b,T){(1+(T/x)^(a*b)*exp(a*(T-x)))^(-1)}
+pdburr <- function(x,a,b,T){(1+(T/x)^(a*b)*exp(b*(T-x)))^(-1)}
 # c.d.f of our derived Burr distribution
-ddburr <- function(x,a,b,T){a*(x+b)*(T/x)^(a*b)*exp(a*(T-x))/(x*(1+(T/x)^(a*b)*exp(a*(T-x)))^2)}
+ddburr <- function(x,a,b,T){b*(x+a)*(T/x)^(a*b)*exp(b*(T-x))/(x*(1+(T/x)^(a*b)*exp(b*(T-x)))^2)}
 # we also provide an alternate derivation of the derived Burr distribution (the one used in the paper where \beta = \alpha*\beta of the above equations
-dburrNEW <- function(x,a,b,T){(a*x+b)*(T/x)^(b)*exp(a*(T-x))/(x*(1+(T/x)^(b)*exp(a*(T-x)))^2)}
-pburrNEW <- function(x,a,b,T){(1+(T/x)^(b)*exp(a*(T-x)))^(-1)}
+dburrNEW <- function(x,a,b,T){(x/b+a)*(T/x)^(a)*exp((T-x)/b)/(x*(1+(T/x)^(a)*exp((T-x)/b))^2)}
+pburrNEW <- function(x,a,b,T){(1+(T/x)^(a)*exp((T-x)/b))^(-1)}
 
 # incubation period data for legionnaires' disease, anthrax, four groups of salmonellosis data and five groups of campylobacteriosis data
 legionnaires <- c(1,1,2,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,7,7,7,7,7,7,7,7,7,7,7,7,7,8,8,8,8,8,8,8,8,8,8,8,8,8,9,9,9,9,9,9,9,9,9,10,10,10,10,11,11,11,12,12,13,15,16)
@@ -94,17 +94,17 @@ hist(MelbourneIP,breaks=seq(0,20,by=1),xlab="Time in Days",ylab="Density",main="
 lines(seq(0,20,by=0.01),length(MelbourneIP)*dburr3(seq(0,20,by=0.01),c=5.664,k=0.444,s=7.690),col=2)
 lines(seq(0,20,by=0.01),length(MelbourneIP)*dburr10(seq(0,20,by=0.01),k=1.525,c=6.054),col=3)
 lines(seq(0,20,by=0.01),length(MelbourneIP)*dburr12(seq(0,20,by=0.01),c=2.955,k=4.451,s=10.031),col=4)
-lines(seq(0,20,by=0.01),length(MelbourneIP)*ddburr(seq(0,20,by=0.01),a=0.365,b=4.721,T=6.050),col=7)
+lines(seq(0,20,by=0.01),length(MelbourneIP)*dburrNEW(seq(0,20,by=0.01),a=1.726,b=2.739,T=6.051),col=7)
 lines(seq(0,20,by=0.01),length(MelbourneIP)*dgamma(seq(0,20,by=0.01),shape=4.963,rate=0.785),col=8)
 lines(seq(0,20,by=0.01),length(MelbourneIP)*dlnorm(seq(0,20,by=0.01),meanlog=1.740,sdlog=0.488),col=9)
 lines(seq(0,20,by=0.01),length(MelbourneIP)*dweibull(seq(0,20,by=0.01),shape=2.447,scale=7.129),col=5)
 legend(x="topright",legend=c("Type III", "Type X", "Type XII", "Derived", "Gamma", "Lognormal", "Weibull"),lty=c(1,1,1,1,1,1,1),col=c(2,3,4,7,8,9,5),lwd=2)
 
-# code for producing figure 3
+# code for producing figure of hazards in the appendix
 plot(seq(0,20,by=0.01),-log(1-pburr10(seq(0,20,by=0.01),k=1.525,c=6.054)),type="l",col=3,main="Burr Distributions Cumulative Hazard",xlab="Time in Days",ylab="Cumulative Hazard")
 lines(seq(0,20,by=0.01),-log(1-pburr3(seq(0,20,by=0.01),c=5.664,k=0.444,s=7.690)),type="l",col=2)
 lines(seq(0,20,by=0.01),-log(1-pburr12(seq(0,20,by=0.01),c=2.955,k=4.448,s=10.027)),type="l",col=4)
-lines(seq(0,20,by=0.01),-log(1-pdburr(seq(0,20,by=0.01),a=0.365,b=4.721,T=6.050)),type="l",col=7)
+lines(seq(0,20,by=0.01),-log(1-pburrNEW(seq(0,20,by=0.01),a=1.726,b=2.739,T=6.051)),type="l",col=7)
 lines(seq(0,20,by=0.01),-log(1-pgamma(seq(0,20,by=0.01),shape=4.963,rate=0.785)),type="l",col=8)
 lines(seq(0,20,by=0.01),-log(1-plnorm(seq(0,20,by=0.01),meanlog=1.740,sdlog=0.488)),type="l",col=9)
 lines(seq(0,20,by=0.01),-log(1-pweibull(seq(0,20,by=0.01),shape=2.447,scale=7.129)),type="l",col=5)
@@ -218,10 +218,10 @@ result$value*-2+6
 hess <- diag(inv(-result$hessian))
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -234,7 +234,7 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=0.5,b=1.5,T=1.1),lower=c(0.1,0.1,1),upper=c(3,5,25),likelihood,control = list(fnscale = -1),hessian=TRUE)
+result <- optim(c(a=1.5,b=3,T=5.9),lower=c(0.5,1,1),upper=c(10,10,25),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
@@ -388,22 +388,26 @@ hist(MelbourneIP,breaks=seq(0,20,by=1),main="Burr Type XII Distributed Models",x
 lines(x,length(MelbourneIP)*dburr12(c=2.955,k=4.448,s=10.027,x),xlim=c(0,20),col="red")
 lines(y,length(MelbourneIP)*values,type="s",col=7)
 # Derived Burr
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
 values <- c()
 for (i in 1:20){
-values <- append(values,fun01(a=0.4738445,b=1.8574441,T=5.0750177,i))}
+values <- append(values,fun01(a=0.880,b=2.110,T=5.075,i))}
 y <- seq(0,19)
 hist(MelbourneIP,breaks=seq(0,20,by=1),main="Derived Burr Distributed Models",xlab="Time in Days",ylab="Density")
-lines(x,length(MelbourneIP)*ddburr(a=0.365,b=4.733,T=6.050,x),xlim=c(0,20),col="red")
+lines(x,length(MelbourneIP)*dburrNEW(a=1.726,b=2.739,T=6.051,x),xlim=c(0,20),col="red")
 lines(y,length(MelbourneIP)*values,type="s",col=7)
 plot.new()
 legend("center",legend=c("Original","DI"),col=c("red",7),lwd = 5, xpd = FALSE, horiz = TRUE, cex = 1, seg.len=1, bty = 'n')
+
+
+
+
 
 # we provide the code for obtaining the akaike weights and bayes factor analysis in table 5
 # ais and log likelihood values from analysis
