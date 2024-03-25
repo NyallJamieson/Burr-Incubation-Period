@@ -1,6 +1,7 @@
 # Code for "The Burr distribution as a model for the delay between key events in an individual’s infection history"
 library("fitdistrplus")
 library("pracma")
+library("ggplot2")
 
 # cumulative density function (c.d.f) of type III Burr distribution
 pburr3 <- function(x,c,k,s){(1+(x/s)^(-c))^(-k)}
@@ -2860,10 +2861,10 @@ likelihood <- function(z){
 result1 <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1))
 
 # Derived Burr
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
