@@ -15,10 +15,14 @@ pburr12 <- function(x,c,k,s){1-(1+(x/s)^(c))^(1-k)}
 # p.d.f of type XII Burr distribution
 dburr12 <- function(x,c,k,s){c*(k-1)*s^(-1)*(1+(x/s)^(c))^(-k)*(x/s)^(c-1)}
 # c.d.f of our derived Burr distribution
-pdburr <- function(x,a,b,T){(1+(T/x)^(a*b)*exp(b*(T-x)))^(-1)}
+pdburr <- function(x,a,b,T){(1+(T/x)^(a*b)*exp(a*(T-x)))^(-1)}
 # c.d.f of our derived Burr distribution
-ddburr <- function(x,a,b,T){b*(x+a)*(T/x)^(a*b)*exp(b*(T-x))/(x*(1+(T/x)^(a*b)*exp(b*(T-x)))^2)}
-# we also provide an alternate derivation of the derived Burr distribution (the one used in the paper where 1/\beta = \alpha*\beta of the above equations
+ddburr <- function(x,a,b,T){a*(x+b)*(T/x)^(a*b)*exp(a*(T-x))/(x*(1+(T/x)^(a*b)*exp(a*(T-x)))^2)}
+# we also provide an alternate derivation of the derived Burr distribution.
+# where we use a and b above we use two different parameters which are also coded as a and b (however we can see clearly throughout work that
+# the choice of derived Burr distribution formulation will be clear.
+# we transform a into a_new = a_old * b_old
+# we transform b into b_new = 1/a_old
 dburrNEW <- function(x,a,b,T){(x/b+a)*(T/x)^(a)*exp((T-x)/b)/(x*(1+(T/x)^(a)*exp((T-x)/b))^2)}
 pburrNEW <- function(x,a,b,T){(1+(T/x)^(a)*exp((T-x)/b))^(-1)}
 
