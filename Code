@@ -2813,7 +2813,6 @@ lines(x,burrD_aic,col=1,lwd=2)
 legend("bottomright",legend=c("Type III","Type X","Type XII", "Derived Burr"),col=c(2,3,4,1),lty=1, cex=0.8)
 
 # simulation 2 code
-# again we use the original derived burr distribution, not interested in parameter estimates so we just use the original burr 
 # first varying alpha simulation
 a <- 0.880 
 b <- 2.110
@@ -2823,20 +2822,20 @@ a_vec <- c()
 props_vec_ml <- c()
 props_vec_aic <- c()
 
-for (i in seq(from=0.5,to=0.6,by=0.1)){
+for (i in seq(from=0.1,to=6,by=0.1)){
 print(i)
 a_vec <- append(a_vec,i)
 score_ml <- 0
 score_aic <- 0
 
-for (times in 1:5){
+for (times in 1:50){
 print(times)
 Samp <- runif(n=100)
-A <- function(u,x){(1+(T/x)^(a)*exp((T-x)/b))^(-1)-u}
+A <- function(u,x){(1+(T/x)^(i)*exp((T-x)/b))^(-1)-u}
 Uni <- function(z){uniroot(A,c(1e-30,100000),u=z)$root}
 Samples <- lapply(Samp,Uni)
 Samples <- unlist(Samples)
-MelbourneIP <- Samples
+MelbourneIP <- ceiling(Samples)
 
 # Gamma
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
@@ -2873,7 +2872,7 @@ likelihood <- function(y){
                }
                return(my.sum)
 }
-result5 <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.01,0.9,1),upper=c(9,35,10),likelihood,control = list(fnscale = -1))
+result5 <- optim(c(a=i,b=2.5,T=5),lower=c(0.05,0.5,1),upper=c(9,10,10),likelihood,control = list(fnscale = -1))
 
 if (result5$value>result1$value){
 score_ml <- score_ml+1
