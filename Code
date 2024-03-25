@@ -2896,8 +2896,6 @@ a <- 0.880
 b <- 2.110
 T <- 5.075
 
-aa
-
 b_vec <- c()
 props_vec_ml <- c()
 props_vec_aic <- c()
@@ -2968,6 +2966,8 @@ print(props_vec_aic)
 }
 
 # now varying T simulation
+# the T simulation was done using the old derived Burr formulation, and as aa, bb are kept constant and we only vary T (which did not change when moving
+# from the old to new derived Burr formulations we can keep the old simulation
 aa <- 0.474 
 bb <- 1.857
 TT <- 5.075
@@ -3058,15 +3058,11 @@ plot(t_vec,t_result,type="l",lwd=3,col="blue",xlab=expression(T),ylab="Proportio
 
 
 # simulation 3 code and code to produce the heatmaps in figure 7
-shape <- seq(0.5,20,by=0.1)
+shape <- seq(0.5,5,by=0.025)
 mean <- seq(1,20,by=0.1)
 alpha <- c()
 beta <- c()
 T <- c()
-beats <- c()
-diffAverage <- c()
-#diffRate <- c()
-#diffShape <- c()
 
 for (i in shape){
 print(i)
@@ -3075,7 +3071,7 @@ for (j in mean){
 
 data <- rgamma(n=1000,shape=i,rate=i/j)
 gam <- fitdist(data,"gamma",method="mle")
-burr <- fitdist(data,"burrNEW",method="mle",start=list(a=i/j,b=5,T=median(data)))
+burr <- fitdist(data,"burrNEW",method="mle",start=list(a=i/j,b=i,T=median(data)))
 
 if (summary(burr)$estim[1]<0 | summary(burr)$estim[2]<0){
 fun <- function(a,b,T,x){log(a*(x+b))+(a*b)*log(T/x)+(a*(T-x))-log(x)-2*log(1+(T/x)^(a*b)*exp(a*(T-x)))}
@@ -3093,19 +3089,13 @@ result1 <- optim(c(a=1,b=1,T=1),lower=c(0.01,0.1,0.5*median(data)),upper=c(1,500
 alpha <- append(alpha,result1$par[1])
 beta <- append(beta,result1$par[1]*result1$par[2])
 T <- append(T,result1$par[3])
-diffAverage <- append(diffAverage,abs(j-result1$par[3]))
-#diffRate <- append(diffRate,i/j-result1$par[1])
-#diffShape <- append(diffShape,i-result1$par[1]*result1$par[2])
 } else {
 alpha <- append(alpha,summary(burr)$estim[1])
 beta <- append(beta,summary(burr)$estim[2])
 T <- append(T,summary(burr)$estim[3])
-diffAverage <- append(diffAverage,abs(j-summary(burr)$estim[3]))
 }
 }
 }
-
-
 
 data <- expand.grid(X=mean,Y=shape)
 data$Z <- T
@@ -3114,11 +3104,11 @@ ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
   scale_fill_gradientn(colours=rainbow(5)) +
   geom_hline(yintercept=1,linetype="dotted") +
   scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
-  scale_y_continuous(limits=c(0.5,20), expand = c(0, 0)) +
+  scale_y_continuous(limits=c(0.5,5), expand = c(0, 0)) +
   theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=20), axis.title.y=element_text(size=20), legend.title=element_text(size=20)) +
   labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(T[D])) +
   coord_fixed()
-print(ggheatmap)
+ggheatmap + coord_fixed(ratio=4)
 
 
 data <- expand.grid(X=mean,Y=shape)
@@ -3128,11 +3118,11 @@ ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
   scale_fill_gradientn(colours=rainbow(5)) +
   geom_hline(yintercept=1,linetype="dotted") +
   scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
-  scale_y_continuous(limits=c(0.5,20), expand = c(0, 0)) +
+  scale_y_continuous(limits=c(0.5,5), expand = c(0, 0)) +
   theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=20), axis.title.y=element_text(size=20), legend.title=element_text(size=20)) +
-  labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(beta[D])) +
+  labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(alpha[D])) +
   coord_fixed()
-print(ggheatmap)
+ggheatmap + coord_fixed(ratio=4)
 
 
 data <- expand.grid(X=mean,Y=shape)
@@ -3142,22 +3132,8 @@ ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
   scale_fill_gradientn(colours=rainbow(5)) +
   geom_hline(yintercept=1,linetype="dotted") +
   scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
-  scale_y_continuous(limits=c(0.5,20), expand = c(0, 0)) +
+  scale_y_continuous(limits=c(0.5,5), expand = c(0, 0)) +
   theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=20), axis.title.y=element_text(size=20), legend.title=element_text(size=20)) +
-  labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(alpha[D])) +
+  labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(beta[D])) +
   coord_fixed()
-print(ggheatmap)
-
-
-data <- expand.grid(X=mean,Y=shape)
-data$Z <- diffAverage
-ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
-  geom_raster() +
-  scale_fill_gradientn(colours=rainbow(5)) +
-  geom_hline(yintercept=1,linetype="dotted") +
-  scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
-  scale_y_continuous(limits=c(0.5,20), expand = c(0, 0)) +
-  theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=20), axis.title.y=element_text(size=20), legend.title=element_text(size=20)) +
-  labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(mu[Gamma]-T[D])) +
-  coord_fixed()
-print(ggheatmap)
+ggheatmap + coord_fixed(ratio=4)
