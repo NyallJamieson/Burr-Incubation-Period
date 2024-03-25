@@ -1,4 +1,6 @@
 # Code for "The Burr distribution as a model for the delay between key events in an individual’s infection history"
+library("fitdistrplus")
+library("pracma")
 
 # cumulative density function (c.d.f) of type III Burr distribution
 pburr3 <- function(x,c,k,s){(1+(x/s)^(-c))^(-k)}
@@ -16,7 +18,7 @@ dburr12 <- function(x,c,k,s){c*(k-1)*s^(-1)*(1+(x/s)^(c))^(-k)*(x/s)^(c-1)}
 pdburr <- function(x,a,b,T){(1+(T/x)^(a*b)*exp(b*(T-x)))^(-1)}
 # c.d.f of our derived Burr distribution
 ddburr <- function(x,a,b,T){b*(x+a)*(T/x)^(a*b)*exp(b*(T-x))/(x*(1+(T/x)^(a*b)*exp(b*(T-x)))^2)}
-# we also provide an alternate derivation of the derived Burr distribution (the one used in the paper where \beta = \alpha*\beta of the above equations
+# we also provide an alternate derivation of the derived Burr distribution (the one used in the paper where 1/\beta = \alpha*\beta of the above equations
 dburrNEW <- function(x,a,b,T){(x/b+a)*(T/x)^(a)*exp((T-x)/b)/(x*(1+(T/x)^(a)*exp((T-x)/b))^2)}
 pburrNEW <- function(x,a,b,T){(1+(T/x)^(a)*exp((T-x)/b))^(-1)}
 
@@ -41,7 +43,7 @@ Model_gamma <- fitdist(data,"gamma",method="mle")
 Model_burrIII <- fitdist(data,"burr3",method="mle",start=list(c=1,k=1,s=1))
 Model_burrX <- fitdist(data,"burr10",method="mle",start=list(c=1,k=1))
 Model_burrXII <- fitdist(data,"burr12",method="mle",start=list(c=2,k=4,s=10))
-Model_burrDerived <- fitdist(data,"dburr",method="mle",start=list(a=1,b=1,T=1))
+Model_burrDerived <- fitdist(data,"burrNEW",method="mle",start=list(a=2,b=3,T=6))
 # using summary on these outputs "Model_" gives the likelihood, AIC provided in table 2 of the paper
 # the likelihood is used for estimating the Bayes factor also obtained in table 2
 # the parameter estimates in table 3 are obtained from the summary of these outputs
@@ -90,21 +92,21 @@ bf4 <- log10(exp(ll4-ll1))
 bf5 <- log10(exp(ll5-ll1))
 
 # code for producing figure 2
-hist(MelbourneIP,breaks=seq(0,20,by=1),xlab="Time in Days",ylab="Density",main="Melbourne Data with Model Fits")
-lines(seq(0,20,by=0.01),length(MelbourneIP)*dburr3(seq(0,20,by=0.01),c=5.664,k=0.444,s=7.690),col=2)
-lines(seq(0,20,by=0.01),length(MelbourneIP)*dburr10(seq(0,20,by=0.01),k=1.525,c=6.054),col=3)
-lines(seq(0,20,by=0.01),length(MelbourneIP)*dburr12(seq(0,20,by=0.01),c=2.955,k=4.451,s=10.031),col=4)
-lines(seq(0,20,by=0.01),length(MelbourneIP)*dburrNEW(seq(0,20,by=0.01),a=1.726,b=2.739,T=6.051),col=7)
-lines(seq(0,20,by=0.01),length(MelbourneIP)*dgamma(seq(0,20,by=0.01),shape=4.963,rate=0.785),col=8)
-lines(seq(0,20,by=0.01),length(MelbourneIP)*dlnorm(seq(0,20,by=0.01),meanlog=1.740,sdlog=0.488),col=9)
-lines(seq(0,20,by=0.01),length(MelbourneIP)*dweibull(seq(0,20,by=0.01),shape=2.447,scale=7.129),col=5)
+hist(legionnaires,breaks=seq(0,20,by=1),xlab="Time in Days",ylab="Density",main="Melbourne Data with Model Fits")
+lines(seq(0,20,by=0.01),length(legionnaires)*dburr3(seq(0,20,by=0.01),c=5.664,k=0.444,s=7.690),col=2)
+lines(seq(0,20,by=0.01),length(legionnaires)*dburr10(seq(0,20,by=0.01),k=1.525,c=6.054),col=3)
+lines(seq(0,20,by=0.01),length(legionnaires)*dburr12(seq(0,20,by=0.01),c=2.955,k=4.451,s=10.031),col=4)
+lines(seq(0,20,by=0.01),length(legionnaires)*dburrNEW(seq(0,20,by=0.01),a=1.725,b=2.738,T=6.050),col=7)
+lines(seq(0,20,by=0.01),length(legionnaires)*dgamma(seq(0,20,by=0.01),shape=4.963,rate=0.785),col=8)
+lines(seq(0,20,by=0.01),length(legionnaires)*dlnorm(seq(0,20,by=0.01),meanlog=1.740,sdlog=0.488),col=9)
+lines(seq(0,20,by=0.01),length(legionnaires)*dweibull(seq(0,20,by=0.01),shape=2.447,scale=7.129),col=5)
 legend(x="topright",legend=c("Type III", "Type X", "Type XII", "Derived", "Gamma", "Lognormal", "Weibull"),lty=c(1,1,1,1,1,1,1),col=c(2,3,4,7,8,9,5),lwd=2)
 
 # code for producing figure of hazards in the appendix
 plot(seq(0,20,by=0.01),-log(1-pburr10(seq(0,20,by=0.01),k=1.525,c=6.054)),type="l",col=3,main="Burr Distributions Cumulative Hazard",xlab="Time in Days",ylab="Cumulative Hazard")
 lines(seq(0,20,by=0.01),-log(1-pburr3(seq(0,20,by=0.01),c=5.664,k=0.444,s=7.690)),type="l",col=2)
 lines(seq(0,20,by=0.01),-log(1-pburr12(seq(0,20,by=0.01),c=2.955,k=4.448,s=10.027)),type="l",col=4)
-lines(seq(0,20,by=0.01),-log(1-pburrNEW(seq(0,20,by=0.01),a=1.726,b=2.739,T=6.051)),type="l",col=7)
+lines(seq(0,20,by=0.01),-log(1-pburrNEW(seq(0,20,by=0.01),a=1.725,b=2.738,T=6.050)),type="l",col=7)
 lines(seq(0,20,by=0.01),-log(1-pgamma(seq(0,20,by=0.01),shape=4.963,rate=0.785)),type="l",col=8)
 lines(seq(0,20,by=0.01),-log(1-plnorm(seq(0,20,by=0.01),meanlog=1.740,sdlog=0.488)),type="l",col=9)
 lines(seq(0,20,by=0.01),-log(1-pweibull(seq(0,20,by=0.01),shape=2.447,scale=7.129)),type="l",col=5)
@@ -312,7 +314,7 @@ print(j)
 u <- runif(n=1000)
 samp <- c()
 for (i in 1:1000){
-samp <- append(samp,uniroot(function(x) pdburr(x,a=0.365,b=4.721,T=6.05)-u[i],lower=0,upper=1000)$root)}
+samp <- append(samp,uniroot(function(x) pdburr(x,a=1.725,b=2.738,T=6.05)-u[i],lower=0,upper=1000)$root)}
 means1 <- append(means1,mean(samp))}
 means2 <- c()
 for (j in 1:10000){
@@ -320,7 +322,7 @@ print(j)
 u <- runif(n=1000)
 samp <- c()
 for (i in 1:1000){
-samp <- append(samp,uniroot(function(x) pdburr(x,a=0.474,b=1.857,T=5.075)-u[i],lower=0,upper=1000)$root)}
+samp <- append(samp,uniroot(function(x) pdburr(x,a=0.880,b=2.110,T=5.075)-u[i],lower=0,upper=1000)$root)}
 means2 <- append(means2,mean(samp))}
 
 
@@ -400,7 +402,7 @@ for (i in 1:20){
 values <- append(values,fun01(a=0.880,b=2.110,T=5.075,i))}
 y <- seq(0,19)
 hist(MelbourneIP,breaks=seq(0,20,by=1),main="Derived Burr Distributed Models",xlab="Time in Days",ylab="Density")
-lines(x,length(MelbourneIP)*dburrNEW(a=1.726,b=2.739,T=6.051,x),xlim=c(0,20),col="red")
+lines(x,length(MelbourneIP)*dburrNEW(a=1.725,b=2.738,T=6.050,x),xlim=c(0,20),col="red")
 lines(y,length(MelbourneIP)*values,type="s",col=7)
 plot.new()
 legend("center",legend=c("Original","DI"),col=c("red",7),lwd = 5, xpd = FALSE, horiz = TRUE, cex = 1, seg.len=1, bty = 'n')
@@ -553,11 +555,12 @@ result$value
 # Burr XII DI AIC
 result$value*-2+6
 
+NEED TO FIX
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -570,7 +573,7 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.0001,1,1),upper=c(0.1,10,50),likelihood,control = list(fnscale = -1),hessian=TRUE)
+result <- optim(c(a=2,b=690,T=11),lower=c(1,1,10),upper=c(5,1000,20),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
@@ -681,10 +684,10 @@ result$value
 result$value*-2+6
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -697,7 +700,7 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.01,1,1),upper=c(0.5,75,50),likelihood,control = list(fnscale = -1),hessian=TRUE)
+result <- optim(c(a=2.5,b=2.5,T=1.1),lower=c(1,1,1),upper=c(7,10,25),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
@@ -807,10 +810,10 @@ result$value
 result$value*-2+6
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -823,7 +826,7 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.01,1,1),upper=c(0.5,75,50),likelihood,control = list(fnscale = -1),hessian=TRUE)
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(1,1,1),upper=c(5,7,20),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
@@ -933,10 +936,10 @@ result$value
 result$value*-2+6
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -949,7 +952,7 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.0001,1,1),upper=c(0.5,500,50),likelihood,control = list(fnscale = -1),hessian=TRUE)
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(1,1,1),upper=c(5,5000,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
@@ -1059,10 +1062,10 @@ result$value
 result$value*-2+6
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -1075,7 +1078,7 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.01,3,1),upper=c(0.5,1000,50),likelihood,control = list(fnscale = -1),hessian=TRUE)
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(1,1,1),upper=c(5,1000,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
@@ -1185,10 +1188,10 @@ result$value
 result$value*-2+6
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -1201,7 +1204,7 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.5,1,1),upper=c(2,3,3),likelihood,control = list(fnscale = -1),hessian=TRUE)
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(1,1,1),upper=c(5,5,5),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
@@ -1311,10 +1314,10 @@ result$value
 result$value*-2+6
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -1327,7 +1330,7 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.1,1,1),upper=c(2,10,5),likelihood,control = list(fnscale = -1),hessian=TRUE)
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(1,1,1),upper=c(5,5,5),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
@@ -1437,10 +1440,10 @@ result$value
 result$value*-2+6
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -1453,7 +1456,7 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.2,1,1),upper=c(2,10,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(1,1,1),upper=c(5,5,5),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
@@ -1563,10 +1566,10 @@ result$value
 result$value*-2+6
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -1579,7 +1582,7 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.2,1,1),upper=c(2,20,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(1,1,1),upper=c(10,10,10),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
@@ -1689,10 +1692,10 @@ result$value
 result$value*-2+6
 
 # code for derived Burr model
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,(a*(y-x)+b)*exp(a*(T-(y-x))+b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -1705,7 +1708,7 @@ likelihood <- function(y){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.2,0.05,1),upper=c(2,20,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
+result <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.1,1,1),upper=c(5,5,5),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # derived Burr parameters
 result$par
 # derived Burr DI log likelihood
@@ -2593,13 +2596,14 @@ plot.new()
 legend("center",legend=c("Original","DI"),col=c("red",7),lwd = 5, xpd = FALSE, horiz = TRUE, cex = 1, seg.len=1, bty = 'n')
 
 # code for simulation one in figure 5
+# we chose to use original derived burr (parameter estimates don't matter here so two forms of derived burr are equivalent).
 data <-
 c(1,1,2,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5
 ,5,5,5,5,5,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
 6,6,6,7,7,7,7,7,7,7,7,7,7,7,7,7,8,8,8,8,8,8,8,8,8,8,8,8,8,9,9,9,9
 ,9,9,9,9,9,10,10,10,10,11,11,11,12,12,13,15,16)
 
-sizes <- c(10)
+sizes <- c(10,50,100,150,200,250,300,350,400,450,500)
 
 for (c in sizes){
 
@@ -2809,29 +2813,30 @@ lines(x,burrD_aic,col=1,lwd=2)
 legend("bottomright",legend=c("Type III","Type X","Type XII", "Derived Burr"),col=c(2,3,4,1),lty=1, cex=0.8)
 
 # simulation 2 code
+# again we use the original derived burr distribution, not interested in parameter estimates so we just use the original burr 
 # first varying alpha simulation
-aa <- 0.474 
-bb <- 1.857
-TT <- 5.075
+a <- 0.880 
+b <- 2.110
+T <- 5.075
 
 a_vec <- c()
 props_vec_ml <- c()
 props_vec_aic <- c()
 
-for (i in seq(from=0.3,to=10,by=0.1)){
+for (i in seq(from=0.5,to=0.6,by=0.1)){
 print(i)
 a_vec <- append(a_vec,i)
 score_ml <- 0
 score_aic <- 0
 
-for (times in 1:50){
+for (times in 1:5){
 print(times)
 Samp <- runif(n=100)
-A <- function(u,x){(1+(TT/x)^(i*bb)*exp(i*(TT-x)))^(-1)-u}
+A <- function(u,x){(1+(T/x)^(a)*exp((T-x)/b))^(-1)-u}
 Uni <- function(z){uniroot(A,c(1e-30,100000),u=z)$root}
 Samples <- lapply(Samp,Uni)
 Samples <- unlist(Samples)
-MelbourneIP <- ceiling(Samples)
+MelbourneIP <- Samples
 
 # Gamma
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
@@ -2852,10 +2857,10 @@ likelihood <- function(z){
 result1 <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1))
 
 # Derived Burr
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.1 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value)}
 my.sum <- 0
-fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,a*(y-x+b)*exp(a*(T-(y-x))+a*b*log(T/(y-x)))/((y-x)*(1+exp(a*(T-(y-x))+a*b*log(T/(y-x))))^2),0)}
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
 fun01.2 <- function(a,b,T,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value)}
 my.sum <- 0
 fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
@@ -2868,7 +2873,7 @@ likelihood <- function(y){
                }
                return(my.sum)
 }
-result5 <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.1,0.9,1),upper=c(9,35,10),likelihood,control = list(fnscale = -1))
+result5 <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.01,0.9,1),upper=c(9,35,10),likelihood,control = list(fnscale = -1))
 
 if (result5$value>result1$value){
 score_ml <- score_ml+1
@@ -2884,15 +2889,17 @@ print(props_vec_aic)
 }
 
 # now varying beta simulation
-aa <- 0.474 
-bb <- 1.857
-TT <- 5.075
+a <- 0.880 
+b <- 2.110
+T <- 5.075
+
+aa
 
 b_vec <- c()
 props_vec_ml <- c()
 props_vec_aic <- c()
 
-for (i in seq(0.1,6,by=0.1)/aa){
+for (i in seq(1,10,by=0.1)){
 print(i)
 b_vec <- append(b_vec,i)
 score_ml <- 0
@@ -2901,7 +2908,7 @@ score_aic <- 0
 for (times in 1:50){
 print(times)
 Samp <- runif(n=100)
-A <- function(u,x){(1+(TT/x)^(aa*i)*exp(aa*(TT-x)))^(-1)-u}
+A <- function(u,x){(1+(TT/x)^(aa)*exp((TT-x)/i))^(-1)-u}
 Uni <- function(z){uniroot(A,c(1e-30,100000),u=z)$root}
 Samples <- lapply(Samp,Uni)
 Samples <- unlist(Samples)
