@@ -2817,24 +2817,24 @@ legend("bottomright",legend=c("Type III","Type X","Type XII", "Derived Burr"),co
 
 # simulation 2 code
 # first varying alpha simulation
-a <- 0.880 
-b <- 2.110
-T <- 5.075
+aa <- 0.474 
+bb <- 1.857
+TT <- 5.075
 
-a_vec <- c()
+a_vec <- seq(from=0.0538503,to=3.231018,by=0.0538503)
 props_vec_ml <- c()
 props_vec_aic <- c()
 
-for (i in seq(from=0.1,to=6,by=0.1)){
-print(i)
-a_vec <- append(a_vec,i)
+for (j in seq(6,60,by=1)){
+i <- a_vec[j]
+print(i*bb)
 score_ml <- 0
 score_aic <- 0
 
 for (times in 1:50){
 print(times)
 Samp <- runif(n=100)
-A <- function(u,x){(1+(T/x)^(i)*exp((T-x)/b))^(-1)-u}
+A <- function(u,x){(1+(TT/x)^(i*bb)*exp(i*(TT-x)))^(-1)-u}
 Uni <- function(z){uniroot(A,c(1e-30,100000),u=z)$root}
 Samples <- lapply(Samp,Uni)
 Samples <- unlist(Samples)
@@ -2875,7 +2875,7 @@ likelihood <- function(y){
                }
                return(my.sum)
 }
-result5 <- optim(c(a=i,b=2.5,T=5),lower=c(0.05,0.5,1),upper=c(9,10,10),likelihood,control = list(fnscale = -1))
+result5 <- optim(c(a=2.1,b=2.5,T=1.1),lower=c(0.1,0.9,1),upper=c(9,35,10),likelihood,control = list(fnscale = -1))
 
 if (result5$value>result1$value){
 score_ml <- score_ml+1
@@ -3041,8 +3041,9 @@ print(props_vec_aic)
 }
 
 # code for plotting figure 6
-a_vec <- seq(0.3,3,by=0.1)
-a_result <- c(0.88,0.9,0.94,0.92,0.96,0.98,1,0.9,0.84,0.98,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)
+a_vec <- seq(0.6,6,by=0.1)
+a_ml <- c(1.00,1.00,0.98,0.98,0.94,0.88,0.96,0.88,0.86,0.86,0.86,0.80,0.84,0.82,0.86,0.90,0.96,0.98,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00
+a_aic <- c(0.94,0.96,0.92,0.86,0.82,0.78,0.90,0.76,0.64,0.74,0.68,0.64,0.70,0.74,0.66,0.68,0.80,0.92,0.92,0.92,0.98,0.98,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00
 
 b_vec <- seq(0.1,6,by=0.1)
 b_ml <- c(1,1,1,1,1,1,1,1,0.9,0.96,1,0.98,0.94,0.88,0.9,0.82,0.84,0.92,0.8,0.84,0.78,0.78,0.78,0.88,0.76,0.74,0.8,0.7,0.76,0.78,0.78,0.72,0.72,0.76,0.72,0.72,0.72,0.72,0.74,0.7,0.78,0.6,0.8,0.78,0.7,0.66,0.74,0.8,0.7,0.84,0.8,0.8,0.86,0.9,0.86,0.9,0.92,1,0.9,0.86)
