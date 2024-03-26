@@ -2821,20 +2821,27 @@ aa <- 0.474
 bb <- 1.857
 TT <- 5.075
 
-a_vec <- seq(from=0.0538503,to=3.231018,by=0.0538503)
+# want a_new to go seq(0.1,6,by=0.1)
+# but a_new = a_old*b_old
+# if we vary a_old we are also varying b_new without realising
+# so need to keep a_old constant so that b_new=2.110
+# we vary beta_old to make a_new as desired
+# in this case:
+
+a_vec <- seq(from=0.1,to=6,by=0.1)/aa
 props_vec_ml <- c()
 props_vec_aic <- c()
 
-for (j in seq(6,60,by=1)){
+for (j in seq(1,60,by=1)){
 i <- a_vec[j]
-print(i*bb)
+print(i*aa)
 score_ml <- 0
 score_aic <- 0
 
 for (times in 1:50){
 print(times)
 Samp <- runif(n=100)
-A <- function(u,x){(1+(TT/x)^(i*bb)*exp(i*(TT-x)))^(-1)-u}
+A <- function(u,x){(1+(TT/x)^(i*aa)*exp(aa*(TT-x)))^(-1)-u}
 Uni <- function(z){uniroot(A,c(1e-30,100000),u=z)$root}
 Samples <- lapply(Samp,Uni)
 Samples <- unlist(Samples)
