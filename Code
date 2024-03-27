@@ -250,9 +250,9 @@ result$value
 result$value*-2+6
 # standard errors
 hess <- diag(inv(-result$hessian))
-# Output for these DI log likelihood fitting provides values given in tables 4 and 5
+# Output for these DI log likelihood fitting provides values given in tables 2
 
-# code for bootstrapping confidence intervals of the mean for each model, for table 6
+# code for bootstrapping confidence intervals of the mean for each model, for supplementary material
 # code for gamma, means1 is model from using normal data, means2 is model from considering the DI approach
 means1 <- c()
 for (j in 1:10000){
@@ -331,7 +331,7 @@ samp <- append(samp,uniroot(function(x) pdburr(x,a=0.880,b=2.110,T=5.075)-u[i],l
 means2 <- append(means2,mean(samp))}
 
 
-# code for plotting likelihood fitted models and DI likelihood fitted curve models to legionnaires' data in figure 4
+# code for plotting likelihood fitted models and DI likelihood fitted curve models to legionnaires' data in figure 3
 par(mfrow=c(3,2))
 x <- seq(0,20,by=0.01)
 # Gamma
@@ -416,7 +416,7 @@ legend("center",legend=c("Original","DI"),col=c("red",7),lwd = 5, xpd = FALSE, h
 
 
 
-# we provide the code for obtaining the akaike weights and bayes factor analysis in table 5
+# we provide the code for obtaining the DI akaike weights and bayes factor analysis in table 2
 # ais and log likelihood values from analysis
 aic1 <- 552.66
 aic2 <- 548.84
@@ -1785,7 +1785,7 @@ fitdist(camp5,"burr10",method="mle",start=list(c=1,k=1))
 fitdist(camp5,"burr12",method="mle",start=list(c=1,k=10,s=1))
 fitdist(camp5,"burrNEW",method="mle",start=list(a=1,b=1,T=1))
 
-we now produce plots like figure 4, but for the other disease datasets used in analysis
+# we now produce plots like figure 4, but for the other disease datasets used in analysis
 # code for each is provided below
 
 # code for anthrax dataset
