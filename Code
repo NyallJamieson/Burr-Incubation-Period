@@ -319,6 +319,45 @@ hess <- diag(inv(-result$hessian))
 # Output for these DI log likelihood fitting provides values given in tables 2
 
 # code for bootstrapping confidence intervals of the mean for each model, for supplementary material
+
+# code for log-normal, means1 is model from using normal data, means2 is model from considering the DI approach
+means1 <- c()
+for (j in 1:10000){
+print(j)
+samp <- rlnorm(n=1000,meanlog=1.740,sdlog=0.488)
+means1 <- append(means1,mean(samp))}
+means2 <- c()
+for (j in 1:10000){
+print(j)
+samp <- rlnorm(n=1000,meanlog=1.531,sdlog=0.576)
+means2 <- append(means2,mean(samp))}
+mu_C <- mean(means1)
+mu_DI <- mean(means2)
+sd_C <- sd(means1)
+sd_DI <- sd(means2)
+t <- (mu_C-mu_DI)/(sd_C^2/114+sd_DI^2/114)^0.5
+df <- (sd_C^2/114+sd_DI^2/114)^2/((sd_C/114)^2/113+(sd_DI/114)^2/113)
+p <- 2*(1-pt(abs(t),df))
+
+# code for weibull, means1 is model from using normal data, means2 is model from considering the DI approach
+means1 <- c()
+for (j in 1:10000){
+print(j)
+samp <- rweibull(n=1000,shape=2.447,scale=7.129)
+means1 <- append(means1,mean(samp))}
+means2 <- c()
+for (j in 1:10000){
+print(j)
+samp <- rweibull(n=1000,shape=2.058,scale=6.003)
+means2 <- append(means2,mean(samp))}
+mu_C <- mean(means1)
+mu_DI <- mean(means2)
+sd_C <- sd(means1)
+sd_DI <- sd(means2)
+t <- (mu_C-mu_DI)/(sd_C^2/114+sd_DI^2/114)^0.5
+df <- (sd_C^2/114+sd_DI^2/114)^2/((sd_C/114)^2/113+(sd_DI/114)^2/113)
+p <- 2*(1-pt(abs(t),df))
+
 # code for gamma, means1 is model from using normal data, means2 is model from considering the DI approach
 means1 <- c()
 for (j in 1:10000){
@@ -330,17 +369,39 @@ for (j in 1:10000){
 print(j)
 samp <- rgamma(n=1000,shape=3.479,rate=0.653)
 means2 <- append(means2,mean(samp))}
+mu_C <- mean(means1)
+mu_DI <- mean(means2)
+sd_C <- sd(means1)
+sd_DI <- sd(means2)
+t <- (mu_C-mu_DI)/(sd_C^2/114+sd_DI^2/114)^0.5
+df <- (sd_C^2/114+sd_DI^2/114)^2/((sd_C/114)^2/113+(sd_DI/114)^2/113)
+p <- 2*(1-pt(abs(t),df))
 
 # code for Burr III, means1 is model from using normal data, means2 is model from considering the DI approach
 means1 <- c()
 for (j in 1:10000){
 print(j)
-u <- runif(n=100000)
+u <- runif(n=1000)
 samp <- c()
-for (i in 1:100000){
-samp <- append(samp,uniroot(function(x) pburr3(x,c=5.475,k=7.229,s=0.334)-u[i],lower=0,upper=1000)$root)
-print(i)}
+for (i in 1:1000){
+samp <- append(samp,uniroot(function(x) pburr3(x,c=5.475,k=7.229,s=0.334)-u[i],lower=0,upper=1000)$root)}
 means1 <- append(means1,mean(samp))}
+means2 <- c()
+for (j in 1:10000){
+print(j)
+u <- runif(n=1000)
+samp <- c()
+for (i in 1:1000){
+samp <- append(samp,uniroot(function(x) pburr3(x,c=5.664,k=7.690,s=0.444)-u[i],lower=0,upper=1000)$root)}
+means2 <- append(means2,mean(samp))}
+mu_C <- mean(means1)
+mu_DI <- mean(means2)
+sd_C <- sd(means1)
+sd_DI <- sd(means2)
+t <- (mu_C-mu_DI)/(sd_C^2/114+sd_DI^2/114)^0.5
+df <- (sd_C^2/114+sd_DI^2/114)^2/((sd_C/114)^2/113+(sd_DI/114)^2/113)
+p <- 2*(1-pt(abs(t),df))
+
 
 # code for Burr X, means1 is model from using normal data, means2 is model from considering the DI approach
 means1 <- c()
@@ -359,6 +420,13 @@ samp <- c()
 for (i in 1:1000){
 samp <- append(samp,uniroot(function(x) pburr10(x,c=5.848,k=1.065)-u[i],lower=0,upper=1000)$root)}
 means2 <- append(means2,mean(samp))}
+mu_C <- mean(means1)
+mu_DI <- mean(means2)
+sd_C <- sd(means1)
+sd_DI <- sd(means2)
+t <- (mu_C-mu_DI)/(sd_C^2/114+sd_DI^2/114)^0.5
+df <- (sd_C^2/114+sd_DI^2/114)^2/((sd_C/114)^2/113+(sd_DI/114)^2/113)
+p <- 2*(1-pt(abs(t),df))
 
 # Code for Burr XII, means1 is model from using normal data, means2 is model from considering the DI approach
 means1 <- c()
@@ -377,6 +445,13 @@ samp <- c()
 for (i in 1:10000){
 samp <- append(samp,uniroot(function(x) pburr12(x,c=2.249,k=8.643,s=14.194)-u[i],lower=0,upper=1000)$root)}
 means2 <- append(means2,mean(samp))}
+mu_C <- mean(means1)
+mu_DI <- mean(means2)
+sd_C <- sd(means1)
+sd_DI <- sd(means2)
+t <- (mu_C-mu_DI)/(sd_C^2/114+sd_DI^2/114)^0.5
+df <- (sd_C^2/114+sd_DI^2/114)^2/((sd_C/114)^2/113+(sd_DI/114)^2/113)
+p <- 2*(1-pt(abs(t),df))
 
 # Code for derived Burr, means1 is model from using normal data, means2 is model from considering the DI approach
 means1 <- c()
@@ -385,7 +460,7 @@ print(j)
 u <- runif(n=1000)
 samp <- c()
 for (i in 1:1000){
-samp <- append(samp,uniroot(function(x) pdburr(x,a=1.725,b=2.738,T=6.05)-u[i],lower=0,upper=1000)$root)}
+samp <- append(samp,uniroot(function(x) pburrNEW(x,a=1.725,b=2.738,T=6.05)-u[i],lower=0,upper=1000)$root)}
 means1 <- append(means1,mean(samp))}
 means2 <- c()
 for (j in 1:10000){
@@ -393,9 +468,15 @@ print(j)
 u <- runif(n=1000)
 samp <- c()
 for (i in 1:1000){
-samp <- append(samp,uniroot(function(x) pdburr(x,a=0.880,b=2.110,T=5.075)-u[i],lower=0,upper=1000)$root)}
+samp <- append(samp,uniroot(function(x) pburrNEW(x,a=0.880,b=2.110,T=5.075)-u[i],lower=0,upper=1000)$root)}
 means2 <- append(means2,mean(samp))}
-
+mu_C <- mean(means1)
+mu_DI <- mean(means2)
+sd_C <- sd(means1)
+sd_DI <- sd(means2)
+t <- (mu_C-mu_DI)/(sd_C^2/114+sd_DI^2/114)^0.5
+df <- (sd_C^2/114+sd_DI^2/114)^2/((sd_C/114)^2/113+(sd_DI/114)^2/113)
+p <- 2*(1-pt(abs(t),df))
 
 # code for plotting likelihood fitted models and DI likelihood fitted curve models to legionnaires' data in figure 3
 par(mfrow=c(4,2))
@@ -417,7 +498,6 @@ y <- seq(0,19)
 hist(MelbourneIP,breaks=seq(0,20,by=1),main="Log-normal Distributed Models",xlab="Time in Days",ylab="Density")
 lines(x,length(MelbourneIP)*dlnorm(x,meanlog=1.740,sdlog=0.488),xlim=c(0,20),col="red")
 lines(y,length(MelbourneIP)*values,type="s",col=7)
-
 # Weibull
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
 fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
@@ -428,13 +508,12 @@ my.sum <- 0
 fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
 values <- c()
 for (i in 1:20){
-values <- append(values,fun01(a=2.058,b=7.229,i))
+values <- append(values,fun01(a=2.058,b=6.003,i))
 }
 y <- seq(0,19)
 hist(MelbourneIP,breaks=seq(0,20,by=1),main="Weibull Distributed Models",xlab="Time in Days",ylab="Density")
 lines(x,length(MelbourneIP)*dweibull(x,shape=2.447,scale=7.129),xlim=c(0,20),col="red")
 lines(y,length(MelbourneIP)*values,type="s",col=7)
-
 # Gamma
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
