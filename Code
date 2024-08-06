@@ -338,6 +338,10 @@ sd_DI <- sd(means2)
 t <- (mu_C-mu_DI)/(sd_C^2/114+sd_DI^2/114)^0.5
 df <- (sd_C^2/114+sd_DI^2/114)^2/((sd_C/114)^2/113+(sd_DI/114)^2/113)
 p <- 2*(1-pt(abs(t),df))
+lwr1 <- quantile(means1,p=0.025)
+upr1 <- quantile(means1,p=0.975)
+lwr2 <- quantile(means2,p=0.025)
+upr2 <- quantile(means2,p=0.975)
 
 # code for weibull, means1 is model from using normal data, means2 is model from considering the DI approach
 means1 <- c()
@@ -357,6 +361,10 @@ sd_DI <- sd(means2)
 t <- (mu_C-mu_DI)/(sd_C^2/114+sd_DI^2/114)^0.5
 df <- (sd_C^2/114+sd_DI^2/114)^2/((sd_C/114)^2/113+(sd_DI/114)^2/113)
 p <- 2*(1-pt(abs(t),df))
+lwr1 <- quantile(means1,p=0.025)
+upr1 <- quantile(means1,p=0.975)
+lwr2 <- quantile(means2,p=0.025)
+upr2 <- quantile(means2,p=0.975)
 
 # code for gamma, means1 is model from using normal data, means2 is model from considering the DI approach
 means1 <- c()
@@ -376,6 +384,10 @@ sd_DI <- sd(means2)
 t <- (mu_C-mu_DI)/(sd_C^2/114+sd_DI^2/114)^0.5
 df <- (sd_C^2/114+sd_DI^2/114)^2/((sd_C/114)^2/113+(sd_DI/114)^2/113)
 p <- 2*(1-pt(abs(t),df))
+lwr1 <- quantile(means1,p=0.025)
+upr1 <- quantile(means1,p=0.975)
+lwr2 <- quantile(means2,p=0.025)
+upr2 <- quantile(means2,p=0.975)
 
 # code for Burr III, means1 is model from using normal data, means2 is model from considering the DI approach
 means1 <- c()
@@ -384,7 +396,7 @@ print(j)
 u <- runif(n=1000)
 samp <- c()
 for (i in 1:1000){
-samp <- append(samp,uniroot(function(x) pburr3(x,c=5.475,k=7.229,s=0.334)-u[i],lower=0,upper=1000)$root)}
+samp <- append(samp,uniroot(function(x) pburr3(x,c=5.475,k=0.344,s=7.229)-u[i],lower=0,upper=1000)$root)}
 means1 <- append(means1,mean(samp))}
 means2 <- c()
 for (j in 1:10000){
@@ -392,7 +404,7 @@ print(j)
 u <- runif(n=1000)
 samp <- c()
 for (i in 1:1000){
-samp <- append(samp,uniroot(function(x) pburr3(x,c=5.664,k=7.690,s=0.444)-u[i],lower=0,upper=1000)$root)}
+samp <- append(samp,uniroot(function(x) pburr3(x,c=5.664,k=0.444,s=7.690)-u[i],lower=0,upper=1000)$root)}
 means2 <- append(means2,mean(samp))}
 mu_C <- mean(means1)
 mu_DI <- mean(means2)
@@ -401,6 +413,10 @@ sd_DI <- sd(means2)
 t <- (mu_C-mu_DI)/(sd_C^2/114+sd_DI^2/114)^0.5
 df <- (sd_C^2/114+sd_DI^2/114)^2/((sd_C/114)^2/113+(sd_DI/114)^2/113)
 p <- 2*(1-pt(abs(t),df))
+lwr1 <- quantile(means1,p=0.025)
+upr1 <- quantile(means1,p=0.975)
+lwr2 <- quantile(means2,p=0.025)
+upr2 <- quantile(means2,p=0.975)
 
 
 # code for Burr X, means1 is model from using normal data, means2 is model from considering the DI approach
@@ -427,6 +443,10 @@ sd_DI <- sd(means2)
 t <- (mu_C-mu_DI)/(sd_C^2/114+sd_DI^2/114)^0.5
 df <- (sd_C^2/114+sd_DI^2/114)^2/((sd_C/114)^2/113+(sd_DI/114)^2/113)
 p <- 2*(1-pt(abs(t),df))
+lwr1 <- quantile(means1,p=0.025)
+upr1 <- quantile(means1,p=0.975)
+lwr2 <- quantile(means2,p=0.025)
+upr2 <- quantile(means2,p=0.975)
 
 # Code for Burr XII, means1 is model from using normal data, means2 is model from considering the DI approach
 means1 <- c()
@@ -452,6 +472,11 @@ sd_DI <- sd(means2)
 t <- (mu_C-mu_DI)/(sd_C^2/114+sd_DI^2/114)^0.5
 df <- (sd_C^2/114+sd_DI^2/114)^2/((sd_C/114)^2/113+(sd_DI/114)^2/113)
 p <- 2*(1-pt(abs(t),df))
+lwr1 <- quantile(means1,p=0.025)
+upr1 <- quantile(means1,p=0.975)
+lwr2 <- quantile(means2,p=0.025)
+upr2 <- quantile(means2,p=0.975)
+
 
 # Code for derived Burr, means1 is model from using normal data, means2 is model from considering the DI approach
 means1 <- c()
@@ -477,6 +502,11 @@ sd_DI <- sd(means2)
 t <- (mu_C-mu_DI)/(sd_C^2/114+sd_DI^2/114)^0.5
 df <- (sd_C^2/114+sd_DI^2/114)^2/((sd_C/114)^2/113+(sd_DI/114)^2/113)
 p <- 2*(1-pt(abs(t),df))
+lwr1 <- quantile(means1,p=0.025)
+upr1 <- quantile(means1,p=0.975)
+lwr2 <- quantile(means2,p=0.025)
+upr2 <- quantile(means2,p=0.975)
+
 
 # code for plotting likelihood fitted models and DI likelihood fitted curve models to legionnaires' data in figure 3
 par(mfrow=c(4,2))
