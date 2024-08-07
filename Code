@@ -671,7 +671,60 @@ bf5 <- log10(exp(ll5-ll1))
 
 # for producing the results in table 6 we use the DI likelihood fitting methods coded above with the other disease data, instead of the "MelbourneIP" legionella data
 # here we now provide the code to fit the DI likelihood methods to each other disease datasets
+
 # we first analyse anthrax dataset
+# code for the DI log-normal model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(anthrax)){
+		my.sum=my.sum+fun01(a,b,anthrax[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
+# log-normal parameters
+result$par
+# log-normal DI log likelihood
+result$value
+# log-normal DI AIC
+result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
+
+# code for the DI weibull model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(anthrax)){
+		my.sum=my.sum+fun01(a,b,anthrax[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=2,b=3),lower=c(0.1,0.1),upper=c(15,30),likelihood,control = list(fnscale = -1),hessian=TRUE)
+# weibull parameters
+result$par
+# weibull DI log likelihood
+result$value
+# weibull DI AIC
+result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
+
 # code for the DI gamma model
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
@@ -799,6 +852,59 @@ hess <- sqrt(diag(inv(-result$hessian)))
 
 # we analyse the first salmonella dataset
 # code for producing DI likelihood
+# code for the DI log-normal model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(salm1)){
+		my.sum=my.sum+fun01(a,b,salm1[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
+# log-normal parameters
+result$par
+# log-normal DI log likelihood
+result$value
+# log-normal DI AIC
+result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
+
+# code for the DI weibull model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(salm1)){
+		my.sum=my.sum+fun01(a,b,salm1[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=2,b=3),lower=c(0.1,0.1),upper=c(15,30),likelihood,control = list(fnscale = -1),hessian=TRUE)
+# weibull parameters
+result$par
+# weibull DI log likelihood
+result$value
+# weibull DI AIC
+result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
+
+
 # code for the DI gamma model
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
@@ -925,6 +1031,58 @@ hess <- sqrt(diag(inv(-result$hessian)))
 
 # we analyse the second salmonella dataset
 # code for producing DI likelihood
+# code for the DI log-normal model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(salm2)){
+		my.sum=my.sum+fun01(a,b,salm2[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
+# log-normal parameters
+result$par
+# log-normal DI log likelihood
+result$value
+# log-normal DI AIC
+result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
+
+# code for the DI weibull model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(salm2)){
+		my.sum=my.sum+fun01(a,b,salm2[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=2,b=3),lower=c(0.1,0.1),upper=c(15,30),likelihood,control = list(fnscale = -1),hessian=TRUE)
+# weibull parameters
+result$par
+# weibull DI log likelihood
+result$value
+# weibull DI AIC
+result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
+
 # code for the DI gamma model
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
@@ -1051,6 +1209,58 @@ hess <- sqrt(diag(inv(-result$hessian)))
 
 # we analyse the third salmonella dataset
 # code for producing DI likelihood
+# code for the DI log-normal model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(salm3)){
+		my.sum=my.sum+fun01(a,b,salm3[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
+# log-normal parameters
+result$par
+# log-normal DI log likelihood
+result$value
+# log-normal DI AIC
+result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
+
+# code for the DI weibull model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(salm3)){
+		my.sum=my.sum+fun01(a,b,salm3[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=2,b=3),lower=c(0.5,1),upper=c(5,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
+# weibull parameters
+result$par
+# weibull DI log likelihood
+result$value
+# weibull DI AIC
+result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
+
 # code for the DI gamma model
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
@@ -1177,6 +1387,59 @@ hess <- sqrt(diag(inv(-result$hessian)))
 
 # we analyse the fourth salmonella dataset
 # code for producing DI likelihood
+# code for the DI log-normal model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(salm4)){
+		my.sum=my.sum+fun01(a,b,salm4[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
+# log-normal parameters
+result$par
+# log-normal DI log likelihood
+result$value
+# log-normal DI AIC
+result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
+
+# code for the DI weibull model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(salm4)){
+		my.sum=my.sum+fun01(a,b,salm4[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=2,b=3),lower=c(0.5,1),upper=c(5,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
+# weibull parameters
+result$par
+# weibull DI log likelihood
+result$value
+# weibull DI AIC
+result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
+
+
 # code for the DI gamma model
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
@@ -1303,6 +1566,58 @@ hess <- sqrt(diag(inv(-result$hessian)))
 
 # we analyse the first campylobacteriosis dataset
 # code for producing DI likelihood
+# code for the DI log-normal model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(camp1)){
+		my.sum=my.sum+fun01(a,b,camp1[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(5,5),likelihood,control = list(fnscale = -1),hessian=TRUE)
+# log-normal parameters
+result$par
+# log-normal DI log likelihood
+result$value
+# log-normal DI AIC
+result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
+
+# code for the DI weibull model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(camp1)){
+		my.sum=my.sum+fun01(a,b,camp1[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=2,b=3),lower=c(0.5,1),upper=c(5,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
+# weibull parameters
+result$par
+# weibull DI log likelihood
+result$value
+# weibull DI AIC
+result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
+
 # code for the DI gamma model
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
@@ -1429,6 +1744,58 @@ hess <- diag(inv(-result$hessian))
 
 # we analyse the second campylobacteriosis dataset
 # code for producing DI likelihood
+# code for the DI log-normal model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(camp2)){
+		my.sum=my.sum+fun01(a,b,camp2[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=1,b=1),lower=c(0.01,0.1),upper=c(5,5),likelihood,control = list(fnscale = -1),hessian=TRUE)
+# log-normal parameters
+result$par
+# log-normal DI log likelihood
+result$value
+# log-normal DI AIC
+result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
+
+# code for the DI weibull model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(camp2)){
+		my.sum=my.sum+fun01(a,b,camp2[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=2,b=3),lower=c(0.5,1),upper=c(5,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
+# weibull parameters
+result$par
+# weibull DI log likelihood
+result$value
+# weibull DI AIC
+result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
+
 # code for the DI gamma model
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
@@ -1555,6 +1922,58 @@ hess <- diag(inv(-result$hessian))
 
 # we analyse the third campylobacteriosis dataset
 # code for producing DI likelihood
+# code for the DI log-normal model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(camp3)){
+		my.sum=my.sum+fun01(a,b,camp3[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=1,b=1),lower=c(0.01,0.1),upper=c(5,5),likelihood,control = list(fnscale = -1),hessian=TRUE)
+# log-normal parameters
+result$par
+# log-normal DI log likelihood
+result$value
+# log-normal DI AIC
+result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
+
+# code for the DI weibull model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(camp3)){
+		my.sum=my.sum+fun01(a,b,camp3[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=2,b=3),lower=c(0.5,1),upper=c(5,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
+# weibull parameters
+result$par
+# weibull DI log likelihood
+result$value
+# weibull DI AIC
+result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
+
 # code for the DI gamma model
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
@@ -1680,7 +2099,58 @@ result$value*-2+6
 hess <- diag(inv(-result$hessian))
 
 # we analyse the fourth campylobacteriosis dataset
-# code for producing DI likelihood
+# code for the DI log-normal model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(camp4)){
+		my.sum=my.sum+fun01(a,b,camp4[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
+# log-normal parameters
+result$par
+# log-normal DI log likelihood
+result$value
+# log-normal DI AIC
+result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
+
+# code for the DI weibull model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(camp4)){
+		my.sum=my.sum+fun01(a,b,camp4[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=2,b=3),lower=c(0.5,1),upper=c(5,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
+# weibull parameters
+result$par
+# weibull DI log likelihood
+result$value
+# weibull DI AIC
+result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
+
 # code for the DI gamma model
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
@@ -1807,6 +2277,58 @@ hess <- diag(inv(-result$hessian))
 
 # we analyse the fifth campylobacteriosis dataset
 # code for producing DI likelihood
+# code for the DI log-normal model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(camp5)){
+		my.sum=my.sum+fun01(a,b,camp5[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
+# log-normal parameters
+result$par
+# log-normal DI log likelihood
+result$value
+# log-normal DI AIC
+result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
+
+# code for the DI weibull model
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value)}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+likelihood <- function(z){
+	a <- z[1]
+	b <- z[2]
+	for (i in 1:length(camp5)){
+		my.sum=my.sum+fun01(a,b,camp5[i])
+	} 
+	return(my.sum)
+}
+result <- optim(c(a=2,b=3),lower=c(0.5,1),upper=c(5,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
+# weibull parameters
+result$par
+# weibull DI log likelihood
+result$value
+# weibull DI AIC
+result$value*-2+4
+# standard errors
+hess <- diag(inv(-result$hessian))
+
 # code for the DI gamma model
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){log(integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value)}
