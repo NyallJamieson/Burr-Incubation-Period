@@ -147,7 +147,7 @@ likelihood <- function(z){
 	} 
 	return(my.sum)
 }
-result <- optim(c(a=1,b=1),lower=c(0.1,0.1),upper=c(15,15),likelihood,control = list(fnscale = -1),hessian=TRUE)
+result <- optim(c(a=1,b=1),lower=c(1,0.5),upper=c(5,5),likelihood,control = list(fnscale = -1),hessian=TRUE)
 # log-normal parameters
 result$par
 # log-normal DI log likelihood
