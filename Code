@@ -633,41 +633,57 @@ aic2 <- 548.84
 aic3 <- 549.18
 aic4 <- 550.54
 aic5 <- 547.50
+aicLN <- 566.49
+aicWEI <- 549.26
 ll1 <- -274.33
 ll2 <- -271.42
 ll3 <- -272.59
 ll4 <- -272.27
 ll5 <- -270.75
+llLN <- -281.24
+llWEI <- -272.63
 # extract minimum aic out of models
-min <- min(aic1,aic2,aic3,aic4,aic5)
+min <- min(aic1,aic2,aic3,aic4,aic5,aicLN,aicWEI)
 # extract difference of aic from minimum aic
 diff1 <- aic1-min
 diff2 <- aic2-min
 diff3 <- aic3-min
 diff4 <- aic4-min
 diff5 <- aic5-min
+diffLN <- aicLN-min
+diffWEI <- aicWEI-min
+
 # calculate akaike weights
-w1 <- exp(-0.5*diff1)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5))
-w2 <- exp(-0.5*diff2)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5))
-w3 <- exp(-0.5*diff3)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5))
-w4 <- exp(-0.5*diff4)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5))
-w5 <- exp(-0.5*diff5)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5))
+w1 <- exp(-0.5*diff1)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5)+exp(-0.5*diffLN)+exp(-0.5*diffWEI))
+w2 <- exp(-0.5*diff2)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5)+exp(-0.5*diffLN)+exp(-0.5*diffWEI))
+w3 <- exp(-0.5*diff3)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5)+exp(-0.5*diffLN)+exp(-0.5*diffWEI))
+w4 <- exp(-0.5*diff4)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5)+exp(-0.5*diffLN)+exp(-0.5*diffWEI))
+w5 <- exp(-0.5*diff5)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5)+exp(-0.5*diffLN)+exp(-0.5*diffWEI))
+wLN <- exp(-0.5*diffLN)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5)+exp(-0.5*diffLN)+exp(-0.5*diffWEI))
+wWEI <- exp(-0.5*diffWEI)/(exp(-0.5*diff1)+exp(-0.5*diff2)+exp(-0.5*diff3)+exp(-0.5*diff4)+exp(-0.5*diff5)+exp(-0.5*diffLN)+exp(-0.5*diffWEI))
+
 # values for analysis in table 2
 w1/w1
 w2/w1
 w3/w1
 w4/w1
 w5/w1
+wLN/w1
+wWEI/w1
 # more values for analysis in table 2
 w2/(w2+w1)
 w3/(w3+w1)
 w4/(w4+w1)
 w5/(w5+w1)
+wLN/(wLN+w1)
+wWEI/(wWEI+w1)
 # more values for analysis in table 2
 bf2 <- log10(exp(ll2-ll1))
 bf3 <- log10(exp(ll3-ll1))
 bf4 <- log10(exp(ll4-ll1))
 bf5 <- log10(exp(ll5-ll1))
+bfLN <- log10(exp(llLN-ll1))
+bfWEI <- log10(exp(llWEI-ll1))
 
 # for producing the results in table 6 we use the DI likelihood fitting methods coded above with the other disease data, instead of the "MelbourneIP" legionella data
 # here we now provide the code to fit the DI likelihood methods to each other disease datasets
@@ -2457,65 +2473,85 @@ hess <- diag(inv(-result$hessian))
 # we now want to plot each dataset with curve fits from normal maximum likelihood methods as well as the DI likelihood method plotted on top as was done for the legionella data
 # first need to find parameters of distributions when fitting by normal maximum likelihood methods
 # find parameters for anthrax dataset
+summary(fitdist(anthrax,"lnorm",method="mle"))
+summary(fitdist(anthrax,"weibull",method="mle"))
 summary(fitdist(anthrax,"gamma",method="mle"))
 summary(fitdist(anthrax,"burr3",method="mle",start=list(c=1,k=1,s=1)))
 summary(fitdist(anthrax,"burr10",method="mle",start=list(c=5,k=5)))
 summary(fitdist(anthrax,"burr12",method="mle",start=list(c=1,k=10,s=1)))
-summary(fitdist(anthrax,"burrNEW",method="mle",start=list(a=0.3,b=5,T=1)))
+summary(fitdist(anthrax,"burrNEW",method="mle",start=list(a=0.3,b=15,T=10)))
 # find parameters for first salmonellosis dataset
+summary(fitdist(salm1,"lnorm",method="mle"))
+summary(fitdist(salm1,"weibull",method="mle"))
 summary(fitdist(salm1,"gamma",method="mle"))
 summary(fitdist(salm1,"burr3",method="mle",start=list(c=1,k=1,s=1)))
 summary(fitdist(salm1,"burr10",method="mle",start=list(c=5,k=5)))
 summary(fitdist(salm1,"burr12",method="mle",start=list(c=1,k=10,s=1)))
 summary(fitdist(salm1,"burrNEW",method="mle",start=list(a=0.3,b=5,T=10)))
 # find parameters for second salmonellosis dataset
-fitdist(salm2,"gamma",method="mle")
-fitdist(salm2,"burr3",method="mle",start=list(c=1,k=1,s=1))
-fitdist(salm2,"burr10",method="mle",start=list(c=5,k=5))
-fitdist(salm2,"burr12",method="mle",start=list(c=1,k=10,s=1))
-fitdist(salm2,"burrNEW",method="mle",start=list(a=0.3,b=50,T=1))
+summary(fitdist(salm2,"lnorm",method="mle"))
+summary(fitdist(salm2,"weibull",method="mle"))
+summary(fitdist(salm2,"gamma",method="mle"))
+summary(fitdist(salm2,"burr3",method="mle",start=list(c=1,k=1,s=1)))
+summary(fitdist(salm2,"burr10",method="mle",start=list(c=5,k=5)))
+summary(fitdist(salm2,"burr12",method="mle",start=list(c=1,k=10,s=1)))
+summary(fitdist(salm2,"burrNEW",method="mle",start=list(a=0.3,b=50,T=1)))
 # find parameters for third salmonellosis dataset
-fitdist(salm3,"gamma",method="mle")
-fitdist(salm3,"burr3",method="mle",start=list(c=1,k=1,s=1))
-fitdist(salm3,"burr10",method="mle",start=list(c=5,k=5))
-fitdist(salm3,"burr12",method="mle",start=list(c=1,k=10,s=1))
-fitdist(salm3,"dburr",method="mle",start=list(a=0.3,b=100,T=1))
+summary(fitdist(salm3,"lnorm",method="mle"))
+summary(fitdist(salm3,"weibull",method="mle"))
+summary(fitdist(salm3,"gamma",method="mle"))
+summary(fitdist(salm3,"burr3",method="mle",start=list(c=1,k=1,s=1)))
+summary(fitdist(salm3,"burr10",method="mle",start=list(c=5,k=5)))
+summary(fitdist(salm3,"burr12",method="mle",start=list(c=1,k=10,s=1)))
+summary(fitdist(salm3,"dburr",method="mle",start=list(a=0.3,b=100,T=1)))
 # find parameters for fourth salmonellosis dataset
-fitdist(salm4,"gamma",method="mle")
-fitdist(salm4,"burr3",method="mle",start=list(c=1,k=1,s=1))
-fitdist(salm4,"burr10",method="mle",start=list(c=5,k=5))
-fitdist(salm4,"burr12",method="mle",start=list(c=1,k=10,s=1))
-fitdist(salm4,"dburr",method="mle",start=list(a=1,b=100,T=10))
+summary(fitdist(salm4,"lnorm",method="mle"))
+summary(fitdist(salm4,"weibull",method="mle"))
+summary(fitdist(salm4,"gamma",method="mle"))
+summary(fitdist(salm4,"burr3",method="mle",start=list(c=1,k=1,s=1)))
+summary(fitdist(salm4,"burr10",method="mle",start=list(c=5,k=5)))
+summary(fitdist(salm4,"burr12",method="mle",start=list(c=1,k=10,s=1)))
+summary(fitdist(salm4,"dburr",method="mle",start=list(a=1,b=100,T=10)))
 # find parameters for first campylobacteriosis dataset
-fitdist(camp1,"gamma",method="mle")
-fitdist(camp1,"burr3",method="mle",start=list(c=1,k=1,s=1))
-fitdist(camp1,"burr10",method="mle",start=list(c=1,k=1))
-fitdist(camp1,"burr12",method="mle",start=list(c=1,k=10,s=1))
-fitdist(camp1,"burrNEW",method="mle",start=list(a=1,b=1,T=1))
+summary(fitdist(camp1,"lnorm",method="mle"))
+summary(fitdist(camp1,"weibull",method="mle"))
+summary(fitdist(camp1,"gamma",method="mle"))
+summary(fitdist(camp1,"burr3",method="mle",start=list(c=1,k=1,s=1)))
+summary(fitdist(camp1,"burr10",method="mle",start=list(c=1,k=1)))
+summary(fitdist(camp1,"burr12",method="mle",start=list(c=1,k=10,s=1)))
+summary(fitdist(camp1,"burrNEW",method="mle",start=list(a=1,b=1,T=1)))
 # find parameters for second campylobacteriosis dataset
-fitdist(camp2,"gamma",method="mle")
-fitdist(camp2,"burr3",method="mle",start=list(c=1,k=1,s=1))
-fitdist(camp2,"burr10",method="mle",start=list(c=1,k=1))
-fitdist(camp2,"burr12",method="mle",start=list(c=1,k=10,s=1))
-fitdist(camp2,"burrNEW",method="mle",start=list(a=1,b=1,T=1))
+summary(fitdist(camp2,"lnorm",method="mle"))
+summary(fitdist(camp2,"weibull",method="mle"))
+summary(fitdist(camp2,"gamma",method="mle"))
+summary(fitdist(camp2,"burr3",method="mle",start=list(c=1,k=1,s=1)))
+summary(fitdist(camp2,"burr10",method="mle",start=list(c=1,k=1)))
+summary(fitdist(camp2,"burr12",method="mle",start=list(c=1,k=10,s=1)))
+summary(fitdist(camp2,"burrNEW",method="mle",start=list(a=1,b=1,T=1)))
 # find parameters for third campylobacteriosis dataset
-fitdist(camp3,"gamma",method="mle")
-fitdist(camp3,"burr3",method="mle",start=list(c=1,k=1,s=1))
-fitdist(camp3,"burr10",method="mle",start=list(c=1,k=1))
-fitdist(camp3,"burr12",method="mle",start=list(c=1,k=10,s=1))
-fitdist(camp3,"burrNEW",method="mle",start=list(a=1,b=1,T=1))
+summary(fitdist(camp3,"lnorm",method="mle"))
+summary(fitdist(camp3,"weibull",method="mle"))
+summary(fitdist(camp3,"gamma",method="mle"))
+summary(fitdist(camp3,"burr3",method="mle",start=list(c=1,k=1,s=1)))
+summary(fitdist(camp3,"burr10",method="mle",start=list(c=1,k=1)))
+summary(fitdist(camp3,"burr12",method="mle",start=list(c=1,k=10,s=1)))
+summary(fitdist(camp3,"burrNEW",method="mle",start=list(a=1,b=1,T=1)))
 # find parameters for fourth campylobacteriosis dataset
-fitdist(camp4,"gamma",method="mle")
-fitdist(camp4,"burr3",method="mle",start=list(c=1,k=1,s=1))
-fitdist(camp4,"burr10",method="mle",start=list(c=1,k=1))
-fitdist(camp4,"burr12",method="mle",start=list(c=1,k=10,s=1))
-fitdist(camp4,"burrNEW",method="mle",start=list(a=1,b=1,T=1))
+summary(fitdist(camp4,"lnorm",method="mle"))
+summary(fitdist(camp4,"weibull",method="mle"))
+summary(fitdist(camp4,"gamma",method="mle"))
+summary(fitdist(camp4,"burr3",method="mle",start=list(c=1,k=1,s=1)))
+summary(fitdist(camp4,"burr10",method="mle",start=list(c=1,k=1)))
+summary(fitdist(camp4,"burr12",method="mle",start=list(c=1,k=10,s=1)))
+summary(fitdist(camp4,"burrNEW",method="mle",start=list(a=1,b=1,T=1)))
 # find parameters for fifth campylobacteriosis dataset
-fitdist(camp5,"gamma",method="mle")
-fitdist(camp5,"burr3",method="mle",start=list(c=1,k=1,s=1))
-fitdist(camp5,"burr10",method="mle",start=list(c=1,k=1))
-fitdist(camp5,"burr12",method="mle",start=list(c=1,k=10,s=1))
-fitdist(camp5,"burrNEW",method="mle",start=list(a=1,b=1,T=1))
+summary(fitdist(camp5,"lnorm",method="mle"))
+summary(fitdist(camp5,"weibull",method="mle"))
+summary(fitdist(camp5,"gamma",method="mle"))
+summary(fitdist(camp5,"burr3",method="mle",start=list(c=1,k=1,s=10)))
+summary(fitdist(camp5,"burr10",method="mle",start=list(c=1,k=1)))
+summary(fitdist(camp5,"burr12",method="mle",start=list(c=1,k=10,s=1)))
+summary(fitdist(camp5,"burrNEW",method="mle",start=list(a=1,b=1,T=1)))
 
 # we now produce plots like figure 4, but for the other disease datasets used in analysis
 # code for each is provided below
