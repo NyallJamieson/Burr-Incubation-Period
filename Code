@@ -316,10 +316,10 @@ result$value
 result$value*-2+6
 # standard errors
 hess <- diag(inv(-result$hessian))
+
+
 # Output for these DI log likelihood fitting provides values given in tables 2
-
 # code for bootstrapping confidence intervals of the mean for each model, for supplementary material
-
 # code for log-normal, means1 is model from using normal data, means2 is model from considering the DI approach
 means1 <- c()
 for (j in 1:10000){
@@ -3379,7 +3379,7 @@ for (j in mean){
 # print(j)
 
 data <- rgamma(n=1000,shape=i,rate=i/j)
-gam <- fitdist(data,"gamma",method="mle")
+# gam <- fitdist(data,"gamma",method="mle")
 burr <- fitdist(data,"burrNEW",method="mle",start=list(a=i/j,b=i,T=median(data)))
 
 if (summary(burr)$estim[1]<0 | summary(burr)$estim[2]<0){
