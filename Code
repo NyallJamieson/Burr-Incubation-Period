@@ -2557,8 +2557,42 @@ summary(fitdist(camp5,"burrNEW",method="mle",start=list(a=1,b=1,T=1)))
 # code for each is provided below
 
 # code for anthrax dataset
-par(mfrow=c(3,2))
+par(mfrow=c(2,4))
 x <- seq(0,45,by=0.01)
+# Lnorm
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:45){
+values <- append(values,fun01(a=2.577,b=0.671,i))}
+y <- seq(0,44)
+hist(anthrax,breaks=seq(0,45,by=1),main="Anthrax with Log-normal",xlab="Time in Days",ylab="Density")
+lines(x,length(anthrax)*dlnorm(x,meanlog=2.665,sdlog=0.620),xlim=c(0,45),col="red")
+lines(y,length(anthrax)*values,type="s",col=7)
+
+# Weibull
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:45){
+values <- append(values,fun01(a=1.561,b=18.468,i))}
+y <- seq(0,44)
+hist(anthrax,breaks=seq(0,45,by=1),main="Anthrax with Weibull",xlab="Time in Days",ylab="Density")
+lines(x,length(anthrax)*dweibull(x,shape=1.664,scale=19.713),xlim=c(0,45),col="red")
+lines(y,length(anthrax)*values,type="s",col=7)
+
+
+
 # Gamma
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
@@ -2571,7 +2605,7 @@ values <- c()
 for (i in 1:45){
 values <- append(values,fun01(a=2.377,b=0.144,i))}
 y <- seq(0,44)
-hist(anthrax,breaks=seq(0,45,by=1),main="Anthrax with Gamma Model Fits",xlab="Time in Days",ylab="Density")
+hist(anthrax,breaks=seq(0,45,by=1),main="Anthrax with Gamma",xlab="Time in Days",ylab="Density")
 lines(x,length(anthrax)*dgamma(x,shape=2.716,rate=0.156),xlim=c(0,45),col="red")
 lines(y,length(anthrax)*values,type="s",col=7)
 # Burr Type III
@@ -2586,7 +2620,7 @@ values <- c()
 for (i in 1:45){
 values <- append(values,fun01(c=2.030,k=2.667,t=6.786,i))}
 y <- seq(0,44)
-hist(anthrax,breaks=seq(0,45,by=1),main="Anthrax with Burr III Model Fits",xlab="Time in Days",ylab="Density")
+hist(anthrax,breaks=seq(0,45,by=1),main="Anthrax with Burr III",xlab="Time in Days",ylab="Density")
 lines(x,length(anthrax)*dburr3(x,2.088,4.076,5.949),xlim=c(0,45),col="red")
 lines(y,length(anthrax)*values,type="s",col=7)
 # Burr Type X
@@ -2601,7 +2635,7 @@ values <- c()
 for (i in 1:45){
 values <- append(values,fun01(c=22.497,k=0.712,i))}
 y <- seq(0,44)
-hist(anthrax,breaks=seq(0,45,by=1),main="Anthrax with Burr X Model Fits",xlab="Time in Days",ylab="Density")
+hist(anthrax,breaks=seq(0,45,by=1),main="Anthrax with Burr X",xlab="Time in Days",ylab="Density")
 lines(x,length(anthrax)*dburr10(c=22.510,k=0.798,x),xlim=c(0,45),col="red")
 lines(y,length(anthrax)*values,type="s",col=7)
 # Burr Type XII
@@ -2616,7 +2650,7 @@ values <- c()
 for (i in 1:45){
 values <- append(values,fun01(c=3.186,k=1.596,s=9.633,i))}
 y <- seq(0,44)
-hist(anthrax,breaks=seq(0,45,by=1),main="Anthrax with Burr XII Model Fits",xlab="Time in Days",ylab="Density")
+hist(anthrax,breaks=seq(0,45,by=1),main="Anthrax with Burr XII",xlab="Time in Days",ylab="Density")
 lines(x,length(anthrax)*dburr12(c=3.886,k=1.479,s=9.753,x),xlim=c(0,45),col="red")
 lines(y,length(anthrax)*values,type="s",col=7)
 # Derived Burr
@@ -2631,15 +2665,48 @@ values <- c()
 for (i in 1:45){
 values <- append(values,fun01(a=2.352,b=90.001,T=12.963,i))}
 y <- seq(0,44)
-hist(anthrax,breaks=seq(0,45,by=1),main="Anthrax with Derived Burr Model Fits",xlab="Time in Days",ylab="Density")
+hist(anthrax,breaks=seq(0,45,by=1),main="Anthrax with Derived Burr",xlab="Time in Days",ylab="Density")
 lines(x,length(anthrax)*dburrNEW(a=2.708,b=691,T=13.981,x),xlim=c(0,45),col="red")
 lines(y,length(anthrax)*values,type="s",col=7)
 plot.new()
 legend("center",legend=c("Original","DI"),col=c("red",7),lwd = 5, xpd = FALSE, horiz = TRUE, cex = 1, seg.len=1, bty = 'n')
 
 # code for first salmonellosis dataset
-par(mfrow=c(3,2))
+par(mfrow=c(2,4))
 x <- seq(0,34,by=0.01)
+# Lnorm
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:45){
+values <- append(values,fun01(a=2.946,b=0.361,i))}
+y <- seq(0,44)
+hist(salm1,breaks=seq(0,45,by=1),main="Salmonella 1 with Log-normal",xlab="Time in Days",ylab="Density")
+lines(x,length(salm1)*dlnorm(x,meanlog=3.000,sdlog=0.341),xlim=c(0,45),col="red")
+lines(y,length(salm1)*values,type="s",col=7)
+
+# Weibull
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:45){
+values <- append(values,fun01(a=3.506,b=22.457,i))}
+y <- seq(0,44)
+hist(salm1,breaks=seq(0,45,by=1),main="Salmonella 1 with Weibull",xlab="Time in Days",ylab="Density")
+lines(x,length(salm1)*dweibull(x,shape=3.682,scale=23.510),xlim=c(0,45),col="red")
+lines(y,length(salm1)*values,type="s",col=7)
+
+
 # Gamma
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
@@ -2652,7 +2719,7 @@ values <- c()
 for (i in 1:34){
 values <- append(values,fun01(a=8.622,b=0.427,i))}
 y <- seq(0,33)
-hist(salm1,breaks=seq(0,34,by=1),main="Salmonella 1 with Gamma Model Fits",xlab="Time in Days",ylab="Density")
+hist(salm1,breaks=seq(0,34,by=1),main="Salmonella 1 with Gamma",xlab="Time in Days",ylab="Density")
 lines(x,length(salm1)*dgamma(x,shape=9.756,rate=0.452),xlim=c(0,34),col="red")
 lines(y,length(salm1)*values,type="s",col=7)
 # Burr Type III
@@ -2667,7 +2734,7 @@ values <- c()
 for (i in 1:34){
 values <- append(values,fun01(c=10.988,k=0.239,t=27.040,i))}
 y <- seq(0,33)
-hist(salm1,breaks=seq(0,34,by=1),main="Salmonella 1 with Burr III Model Fits",xlab="Time in Days",ylab="Density")
+hist(salm1,breaks=seq(0,34,by=1),main="Salmonella 1 with Burr III",xlab="Time in Days",ylab="Density")
 lines(x,length(salm1)*dburr3(x,10.416,0.276,27.464),xlim=c(0,34),col="red")
 lines(y,length(salm1)*values,type="s",col=7)
 # Burr Type X
@@ -2682,7 +2749,7 @@ values <- c()
 for (i in 1:34){
 values <- append(values,fun01(c=16.169,k=2.646,i))}
 y <- seq(0,33)
-hist(salm1,breaks=seq(0,34,by=1),main="Salmonella 1 with Burr X Model Fits",xlab="Time in Days",ylab="Density")
+hist(salm1,breaks=seq(0,34,by=1),main="Salmonella 1 with Burr X",xlab="Time in Days",ylab="Density")
 lines(x,length(salm1)*dburr10(c=16.456,k=2.961,x),xlim=c(0,34),col="red")
 lines(y,length(salm1)*values,type="s",col=7)
 # Burr Type XII
@@ -2697,7 +2764,7 @@ values <- c()
 for (i in 1:34){
 values <- append(values,fun01(c=3.505,k=1941.906,s=194.710,i))}
 y <- seq(0,33)
-hist(salm1,breaks=seq(0,34,by=1),main="Salmonella 1 with Burr XII Model Fits",xlab="Time in Days",ylab="Density")
+hist(salm1,breaks=seq(0,34,by=1),main="Salmonella 1 with Burr XII",xlab="Time in Days",ylab="Density")
 lines(x,length(salm1)*dburr12(c=3.688,k=99.930,s=81.557,x),xlim=c(0,34),col="red")
 lines(y,length(salm1)*values,type="s",col=7)
 # Derived Burr
@@ -2712,15 +2779,48 @@ values <- c()
 for (i in 1:34){
 values <- append(values,fun01(a=1.332,b=5.198,T=19.979,i))}
 y <- seq(0,33)
-hist(salm1,breaks=seq(0,34,by=1),main="Salmonella 1 with Derived Burr Model Fits",xlab="Time in Days",ylab="Density")
+hist(salm1,breaks=seq(0,34,by=1),main="Salmonella 1 with Derived Burr",xlab="Time in Days",ylab="Density")
 lines(x,length(salm1)*dburrNEW(a=1.446,b=5.265,T=20.982,x),xlim=c(0,34),col="red")
 lines(y,length(salm1)*values,type="s",col=7)
 plot.new()
 legend("center",legend=c("Original","DI"),col=c("red",7),lwd = 5, xpd = FALSE, horiz = TRUE, cex = 1, seg.len=1, bty = 'n')
 
 # code for second salmonellosis dataset
-par(mfrow=c(3,2))
+par(mfrow=c(2,4))
 x <- seq(0,41,by=0.01)
+
+# Lnorm
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:45){
+values <- append(values,fun01(a=2.616,b=0.492,i))}
+y <- seq(0,44)
+hist(salm2,breaks=seq(0,45,by=1),main="Salmonella 2 with Log-normal",xlab="Time in Days",ylab="Density")
+lines(x,length(salm2)*dlnorm(x,meanlog=2.692,sdlog=0.457),xlim=c(0,45),col="red")
+lines(y,length(salm2)*values,type="s",col=7)
+
+# Weibull
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:45){
+values <- append(values,fun01(a=2.440,b=17.054,i))}
+y <- seq(0,44)
+hist(salm2,breaks=seq(0,45,by=1),main="Salmonella 2 with Weibull",xlab="Time in Days",ylab="Density")
+lines(x,length(salm2)*dweibull(x,shape=2.602,scale=18.159),xlim=c(0,45),col="red")
+lines(y,length(salm2)*values,type="s",col=7)
+
 # Gamma
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
@@ -2733,7 +2833,7 @@ values <- c()
 for (i in 1:41){
 values <- append(values,fun01(a=4.916,b=0.324,i))}
 y <- seq(0,40)
-hist(salm2,breaks=seq(0,41,by=1),main="Salmonella 2 with Gamma Model Fits",xlab="Time in Days",ylab="Density")
+hist(salm2,breaks=seq(0,41,by=1),main="Salmonella 2 with Gamma",xlab="Time in Days",ylab="Density")
 lines(x,length(salm2)*dgamma(x,shape=5.704,rate=0.353),xlim=c(0,34),col="red")
 lines(y,length(salm2)*values,type="s",col=7)
 # Burr Type III
@@ -2748,7 +2848,7 @@ values <- c()
 for (i in 1:41){
 values <- append(values,fun01(c=7.071,k=0.319,t=19.929,i))}
 y <- seq(0,40)
-hist(salm2,breaks=seq(0,41,by=1),main="Salmonella 2 with Burr III Model Fits",xlab="Time in Days",ylab="Density")
+hist(salm2,breaks=seq(0,41,by=1),main="Salmonella 2 with Burr III",xlab="Time in Days",ylab="Density")
 lines(x,length(salm2)*dburr3(x,7.149,0.354,20.518),xlim=c(0,41),col="red")
 lines(y,length(salm2)*values,type="s",col=7)
 # Burr Type X
@@ -2763,7 +2863,7 @@ values <- c()
 for (i in 1:41){
 values <- append(values,fun01(c=14.533,k=1.512,i))}
 y <- seq(0,40)
-hist(salm2,breaks=seq(0,41,by=1),main="Salmonella 2 with Burr X Model Fits",xlab="Time in Days",ylab="Density")
+hist(salm2,breaks=seq(0,41,by=1),main="Salmonella 2 with Burr X",xlab="Time in Days",ylab="Density")
 lines(x,length(salm2)*dburr10(c=14.713,k=1.760,x),xlim=c(0,41),col="red")
 lines(y,length(salm2)*values,type="s",col=7)
 # Burr Type XII
@@ -2778,7 +2878,7 @@ values <- c()
 for (i in 1:41){
 values <- append(values,fun01(c=2.943,k=4.896,s=25.290,i))}
 y <- seq(0,40)
-hist(salm2,breaks=seq(0,41,by=1),main="Salmonella 2 with Burr XII Model Fits",xlab="Time in Days",ylab="Density")
+hist(salm2,breaks=seq(0,41,by=1),main="Salmonella 2 with Burr XII",xlab="Time in Days",ylab="Density")
 lines(x,length(salm2)*dburr12(c=3.260,k=4.212,s=24.072,x),xlim=c(0,41),col="red")
 lines(y,length(salm2)*values,type="s",col=7)
 # Derived Burr
@@ -2793,15 +2893,48 @@ values <- c()
 for (i in 1:41){
 values <- append(values,fun01(a=1.118,b=5.050,T=14.718,i))}
 y <- seq(0,40)
-hist(salm2,breaks=seq(0,41,by=1),main="Salmonella 2 with Derived Burr Model Fits",xlab="Time in Days",ylab="Density")
+hist(salm2,breaks=seq(0,41,by=1),main="Salmonella 2 with Derived Burr",xlab="Time in Days",ylab="Density")
 lines(x,length(salm2)*dburrNEW(a=1.552,b=5.707,T=15.682,x),xlim=c(0,40),col="red")
 lines(y,length(salm2)*values,type="s",col=7)
 plot.new()
 legend("center",legend=c("Original","DI"),col=c("red",7),lwd = 5, xpd = FALSE, horiz = TRUE, cex = 1, seg.len=1, bty = 'n')
 
 # code for third salmonellosis dataset
-par(mfrow=c(3,2))
+par(mfrow=c(2,4))
 x <- seq(0,41,by=0.01)
+
+# Lnorm
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:45){
+values <- append(values,fun01(a=2.148,b=0.505,i))}
+y <- seq(0,44)
+hist(salm3,breaks=seq(0,45,by=1),main="Salmonella 3 with Log-normal",xlab="Time in Days",ylab="Density")
+lines(x,length(salm3)*dlnorm(x,meanlog=2.270,sdlog=0.458),xlim=c(0,45),col="red")
+lines(y,length(salm3)*values,type="s",col=7)
+
+# Weibull
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:45){
+values <- append(values,fun01(a=1.737,b=11.232,i))}
+y <- seq(0,44)
+hist(salm3,breaks=seq(0,45,by=1),main="Salmonella 3 with Weibull",xlab="Time in Days",ylab="Density")
+lines(x,length(salm3)*dweibull(x,shape=1.882,scale=12.398),xlim=c(0,45),col="red")
+lines(y,length(salm3)*values,type="s",col=7)
+
 # Gamma
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
@@ -2814,7 +2947,7 @@ values <- c()
 for (i in 1:41){
 values <- append(values,fun01(a=3.583,b=0.362,i))}
 y <- seq(0,40)
-hist(salm3,breaks=seq(0,41,by=1),main="Salmonella 3 with Gamma Model Fits",xlab="Time in Days",ylab="Density")
+hist(salm3,breaks=seq(0,41,by=1),main="Salmonella 3 with Gamma",xlab="Time in Days",ylab="Density")
 lines(x,length(salm3)*dgamma(x,shape=4.314,rate=0.395),xlim=c(0,34),col="red")
 lines(y,length(salm3)*values,type="s",col=7)
 # Burr Type III
@@ -2829,7 +2962,7 @@ values <- c()
 for (i in 1:41){
 values <- append(values,fun01(c=2.858,k=5.042,t=4.095,i))}
 y <- seq(0,40)
-hist(salm3,breaks=seq(0,41,by=1),main="Salmonella 3 with Burr III Model Fits",xlab="Time in Days",ylab="Density")
+hist(salm3,breaks=seq(0,41,by=1),main="Salmonella 3 with Burr III",xlab="Time in Days",ylab="Density")
 lines(x,length(salm3)*dburr3(x,3.190,4.744,5.081),xlim=c(0,41),col="red")
 lines(y,length(salm3)*values,type="s",col=7)
 # Burr Type X
@@ -2844,7 +2977,7 @@ values <- c()
 for (i in 1:41){
 values <- append(values,fun01(c=11.923,k=0.961,i))}
 y <- seq(0,40)
-hist(salm3,breaks=seq(0,41,by=1),main="Salmonella 3 with Burr X Model Fits",xlab="Time in Days",ylab="Density")
+hist(salm3,breaks=seq(0,41,by=1),main="Salmonella 3 with Burr X",xlab="Time in Days",ylab="Density")
 lines(x,length(salm3)*dburr10(c=11.976,k=1.167,x),xlim=c(0,41),col="red")
 lines(y,length(salm3)*values,type="s",col=7)
 # Burr Type XII
@@ -2859,7 +2992,7 @@ values <- c()
 for (i in 1:41){
 values <- append(values,fun01(c=7.501,k=1.297,s=5.794,i))}
 y <- seq(0,40)
-hist(salm3,breaks=seq(0,41,by=1),main="Salmonella 3 with Burr XII Model Fits",xlab="Time in Days",ylab="Density")
+hist(salm3,breaks=seq(0,41,by=1),main="Salmonella 3 with Burr XII",xlab="Time in Days",ylab="Density")
 lines(x,length(salm3)*dburr12(c=8.541,k=1.285,s=6.723,x),xlim=c(0,41),col="red")
 lines(y,length(salm3)*values,type="s",col=7)
 # Derived Burr
@@ -2874,15 +3007,49 @@ values <- c()
 for (i in 1:41){
 values <- append(values,fun01(a=3.681,b=1.6e+5,T=8.100,i))}
 y <- seq(0,40)
-hist(salm3,breaks=seq(0,41,by=1),main="Salmonella 3 with Derived Burr Model Fits",xlab="Time in Days",ylab="Density")
+hist(salm3,breaks=seq(0,41,by=1),main="Salmonella 3 with Derived Burr",xlab="Time in Days",ylab="Density")
 lines(x,length(salm3)*dburrNEW(a=4.069,b=494,T=9.140,x),xlim=c(0,40),col="red")
 lines(y,length(salm3)*values,type="s",col=7)
 plot.new()
 legend("center",legend=c("Original","DI"),col=c("red",7),lwd = 5, xpd = FALSE, horiz = TRUE, cex = 1, seg.len=1, bty = 'n')
 
 # code for fourth salmonellosis dataset
-par(mfrow=c(3,2))
+par(mfrow=c(2,4))
 x <- seq(0,29,by=0.01)
+
+# Lnorm
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:45){
+values <- append(values,fun01(a=1.916,b=0.533,i))}
+y <- seq(0,44)
+hist(salm4,breaks=seq(0,45,by=1),main="Salmonella 4 with Log-normal",xlab="Time in Days",ylab="Density")
+lines(x,length(salm4)*dlnorm(x,meanlog=2.068,sdlog=0.471),xlim=c(0,45),col="red")
+lines(y,length(salm4)*values,type="s",col=7)
+
+# Weibull
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:45){
+values <- append(values,fun01(a=1.680,b=9.025,i))}
+y <- seq(0,44)
+hist(salm4,breaks=seq(0,45,by=1),main="Salmonella 3 with Weibull",xlab="Time in Days",ylab="Density")
+lines(x,length(salm4)*dweibull(x,shape=1.860,scale=10.204),xlim=c(0,45),col="red")
+lines(y,length(salm4)*values,type="s",col=7)
+
+
 # Gamma
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
@@ -2895,7 +3062,7 @@ values <- c()
 for (i in 1:29){
 values <- append(values,fun01(a=3.252,b=0.408,i))}
 y <- seq(0,28)
-hist(salm4,breaks=seq(0,29,by=1),main="Salmonella 4 with Gamma Model Fits",xlab="Time in Days",ylab="Density")
+hist(salm4,breaks=seq(0,29,by=1),main="Salmonella 4 with Gamma",xlab="Time in Days",ylab="Density")
 lines(x,length(salm4)*dgamma(x,shape=4.098,rate=0.456),xlim=c(0,29),col="red")
 lines(y,length(salm4)*values,type="s",col=7)
 # Burr Type III
@@ -2910,7 +3077,7 @@ values <- c()
 for (i in 1:29){
 values <- append(values,fun01(c=2.500,k=269.307,t=0.573,i))}
 y <- seq(0,28)
-hist(salm4,breaks=seq(0,29,by=1),main="Salmonella 4 with Burr III Model Fits",xlab="Time in Days",ylab="Density")
+hist(salm4,breaks=seq(0,29,by=1),main="Salmonella 4 with Burr III",xlab="Time in Days",ylab="Density")
 lines(x,length(salm4)*dburr3(x,2.867,21.347,2.227),xlim=c(0,29),col="red")
 lines(y,length(salm4)*values,type="s",col=7)
 # Burr Type X
@@ -2925,7 +3092,7 @@ values <- c()
 for (i in 1:29){
 values <- append(values,fun01(c=10.007,k=0.880,i))}
 y <- seq(0,28)
-hist(salm4,breaks=seq(0,29,by=1),main="Salmonella 4 with Burr X Model Fits",xlab="Time in Days",ylab="Density")
+hist(salm4,breaks=seq(0,29,by=1),main="Salmonella 4 with Burr X",xlab="Time in Days",ylab="Density")
 lines(x,length(salm4)*dburr10(c=10.057,k=1.111,x),xlim=c(0,29),col="red")
 lines(y,length(salm4)*values,type="s",col=7)
 # Burr Type XII
@@ -2940,7 +3107,7 @@ values <- c()
 for (i in 1:29){
 values <- append(values,fun01(c=9.240,k=1.210,s=4.209,i))}
 y <- seq(0,28)
-hist(salm4,breaks=seq(0,29,by=1),main="Salmonella 4 with Burr XII Model Fits",xlab="Time in Days",ylab="Density")
+hist(salm4,breaks=seq(0,29,by=1),main="Salmonella 4 with Burr XII",xlab="Time in Days",ylab="Density")
 lines(x,length(salm4)*dburr12(c=10.237,k=1.215,s=5.179,x),xlim=c(0,29),col="red")
 lines(y,length(salm4)*values,type="s",col=7)
 # Derived Burr
@@ -2955,15 +3122,47 @@ values <- c()
 for (i in 1:29){
 values <- append(values,fun01(a=3.379,b=1.9e+5,T=6.400,i))}
 y <- seq(0,28)
-hist(salm4,breaks=seq(0,29,by=1),main="Salmonella 4 with Derived Burr Model Fits",xlab="Time in Days",ylab="Density")
+hist(salm4,breaks=seq(0,29,by=1),main="Salmonella 4 with Derived Burr",xlab="Time in Days",ylab="Density")
 lines(x,length(salm4)*dburrNEW(a=3.852,b=1.03e+6,T=7.446,x),xlim=c(0,29),col="red")
 lines(y,length(salm4)*values,type="s",col=7)
 plot.new()
 legend("center",legend=c("Original","DI"),col=c("red",7),lwd = 5, xpd = FALSE, horiz = TRUE, cex = 1, seg.len=1, bty = 'n')
 
 # code for first campylobacteriosis dataset
-par(mfrow=c(3,2))
+par(mfrow=c(2,4))
 x <- seq(0,10,by=0.01)
+
+# Lnorm
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:45){
+values <- append(values,fun01(a=0.162,b=0.785,i))}
+y <- seq(0,44)
+hist(camp1,breaks=seq(0,10,by=1),main="Campylobacter 1 with Log-normal",xlab="Time in Days",ylab="Density",ylim=c(0,140))
+lines(x,length(camp1)*dlnorm(x,meanlog=0.811,sdlog=0.510),xlim=c(0,45),col="red")
+lines(y,length(camp1)*values,type="s",col=7)
+
+# Weibull
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:45){
+values <- append(values,fun01(a=1.229,b=1.667,i))}
+y <- seq(0,44)
+hist(camp1,breaks=seq(0,10,by=1),main="Campylobacter 1 with Weibull",xlab="Time in Days",ylab="Density",ylim=c(0,120))
+lines(x,length(camp1)*dweibull(x,shape=1.984,scale=2.899),xlim=c(0,45),col="red")
+lines(y,length(camp1)*values,type="s",col=7)
 # Gamma
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
@@ -2976,7 +3175,7 @@ values <- c()
 for (i in 1:10){
 values <- append(values,fun01(a=1.512,b=0.968,i))}
 y <- seq(0,9)
-hist(camp1,breaks=seq(0,10,by=1),main="Campylobacter 1 with Gamma Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,120))
+hist(camp1,breaks=seq(0,10,by=1),main="Campylobacter 1 with Gamma",xlab="Time in Days",ylab="Density",ylim=c(0,120))
 lines(x,length(camp1)*dgamma(x,shape=4.048,rate=1.581),xlim=c(0,10),col="red")
 lines(y,length(camp1)*values,type="s",col=7)
 # Burr Type III
@@ -2991,7 +3190,7 @@ values <- c()
 for (i in 1:10){
 values <- append(values,fun01(c=3.520,k=0.301,t=2.389,i))}
 y <- seq(0,9)
-hist(camp1,breaks=seq(0,10,by=1),main="Campylobacter 1 with Burr III Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,120))
+hist(camp1,breaks=seq(0,10,by=1),main="Campylobacter 1 with Burr III",xlab="Time in Days",ylab="Density",ylim=c(0,120))
 lines(x,length(camp1)*dburr3(x,4.019,0.691,2.661),xlim=c(0,10),col="red")
 lines(y,length(camp1)*values,type="s",col=7)
 # Burr Type X
@@ -3006,7 +3205,7 @@ values <- c()
 for (i in 1:10){
 values <- append(values,fun01(c=2.775,k=0.434,i))}
 y <- seq(0,9)
-hist(camp1,breaks=seq(0,10,by=1),main="Campylobacter 1 with Burr X Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,120))
+hist(camp1,breaks=seq(0,10,by=1),main="Campylobacter 1 with Burr X",xlab="Time in Days",ylab="Density",ylim=c(0,120))
 lines(x,length(camp1)*dburr10(c=2.754,k=1.178,x),xlim=c(0,10),col="red")
 lines(y,length(camp1)*values,type="s",col=7)
 # Burr Type XII
@@ -3021,7 +3220,7 @@ values <- c()
 for (i in 1:10){
 values <- append(values,fun01(c=1.470,k=5.564,s=4.230,i))}
 y <- seq(0,9)
-hist(camp1,breaks=seq(0,10,by=1),main="Campylobacter 1 with Burr XII Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,120))
+hist(camp1,breaks=seq(0,10,by=1),main="Campylobacter 1 with Burr XII",xlab="Time in Days",ylab="Density",ylim=c(0,120))
 lines(x,length(camp1)*dburr12(c=3.042,k=2.541,s=2.784,x),xlim=c(0,10),col="red")
 lines(y,length(camp1)*values,type="s",col=7)
 # Derived Burr
@@ -3036,15 +3235,48 @@ values <- c()
 for (i in 1:10){
 values <- append(values,fun01(a=1.097,b=1.616,T=1.259,i))}
 y <- seq(0,9)
-hist(camp1,breaks=seq(0,10,by=1),main="Campylobacter 1 with Derived Burr Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,120))
+hist(camp1,breaks=seq(0,10,by=1),main="Campylobacter 1 with Derived Burr",xlab="Time in Days",ylab="Density",ylim=c(0,120))
 lines(x,length(camp1)*dburrNEW(a=2.850,b=4.099,T=2.305,x),xlim=c(0,10),col="red")
 lines(y,length(camp1)*values,type="s",col=7)
 plot.new()
 legend("center",legend=c("Original","DI"),col=c("red",7),lwd = 5, xpd = FALSE, horiz = TRUE, cex = 1, seg.len=1, bty = 'n')
 
 # code for second campylobacteriosis dataset
-par(mfrow=c(3,2))
+par(mfrow=c(2,4))
 x <- seq(0,10,by=0.01)
+
+# Lnorm
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:45){
+values <- append(values,fun01(a=0.521,b=0.738,i))}
+y <- seq(0,44)
+hist(camp2,breaks=seq(0,10,by=1),main="Campylobacter 2 with Log-normal",xlab="Time in Days",ylab="Density",ylim=c(0,200))
+lines(x,length(camp2)*dlnorm(x,meanlog=1.022,sdlog=0.516),xlim=c(0,45),col="red")
+lines(y,length(camp2)*values,type="s",col=7)
+
+# Weibull
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:45){
+values <- append(values,fun01(a=1.381,b=2.365,i))}
+y <- seq(0,44)
+hist(camp2,breaks=seq(0,10,by=1),main="Campylobacter 2 with Weibull",xlab="Time in Days",ylab="Density",ylim=c(0,200))
+lines(x,length(camp2)*dweibull(x,shape=2.033,scale=3.583),xlim=c(0,45),col="red")
+lines(y,length(camp2)*values,type="s",col=7)
+
 # Gamma
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
@@ -3057,7 +3289,7 @@ values <- c()
 for (i in 1:10){
 values <- append(values,fun01(a=1.843,b=0.853,i))}
 y <- seq(0,9)
-hist(camp2,breaks=seq(0,10,by=1),main="Campylobacter 2 with Gamma Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,200))
+hist(camp2,breaks=seq(0,10,by=1),main="Campylobacter 2 with Gamma",xlab="Time in Days",ylab="Density",ylim=c(0,200))
 lines(x,length(camp2)*dgamma(x,shape=4.027,rate=1.274),xlim=c(0,10),col="red")
 lines(y,length(camp2)*values,type="s",col=7)
 # Burr Type III
@@ -3072,7 +3304,7 @@ values <- c()
 for (i in 1:10){
 values <- append(values,fun01(c=3.328,k=0.398,t=2.895,i))}
 y <- seq(0,9)
-hist(camp2,breaks=seq(0,10,by=1),main="Campylobacter 2 with Burr III Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,200))
+hist(camp2,breaks=seq(0,10,by=1),main="Campylobacter 2 with Burr III",xlab="Time in Days",ylab="Density",ylim=c(0,200))
 lines(x,length(camp2)*dburr3(x,3.682,0.828,3.041),xlim=c(0,10),col="red")
 lines(y,length(camp2)*values,type="s",col=7)
 # Burr Type X
@@ -3087,7 +3319,7 @@ values <- c()
 for (i in 1:10){
 values <- append(values,fun01(c=3.343,k=0.546,i))}
 y <- seq(0,9)
-hist(camp2,breaks=seq(0,10,by=1),main="Campylobacter 2 with Burr X Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,200))
+hist(camp2,breaks=seq(0,10,by=1),main="Campylobacter 2 with Burr X",xlab="Time in Days",ylab="Density",ylim=c(0,200))
 lines(x,length(camp2)*dburr10(c=3.379,k=1.184,x),xlim=c(0,10),col="red")
 lines(y,length(camp2)*values,type="s",col=7)
 # Burr Type XII
@@ -3102,7 +3334,7 @@ values <- c()
 for (i in 1:10){
 values <- append(values,fun01(c=1.589,k=5.994,s=5.935,i))}
 y <- seq(0,9)
-hist(camp2,breaks=seq(0,10,by=1),main="Campylobacter 2 with Burr XII Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,200))
+hist(camp2,breaks=seq(0,10,by=1),main="Campylobacter 2 with Burr XII",xlab="Time in Days",ylab="Density",ylim=c(0,200))
 lines(x,length(camp2)*dburr12(c=3.103,k=2.382,s=3.255,x),xlim=c(0,10),col="red")
 lines(y,length(camp2)*values,type="s",col=7)
 # Derived Burr
@@ -3117,15 +3349,49 @@ values <- c()
 for (i in 1:10){
 values <- append(values,fun01(a=1.345,b=2.313,T=1.793,i))}
 y <- seq(0,9)
-hist(camp2,breaks=seq(0,10,by=1),main="Campylobacter 2 with Derived Burr Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,200))
+hist(camp2,breaks=seq(0,10,by=1),main="Campylobacter 2 with Derived Burr",xlab="Time in Days",ylab="Density",ylim=c(0,200))
 lines(x,length(camp2)*dburrNEW(a=2.883,b=5.517,T=2.829,x),xlim=c(0,10),col="red")
 lines(y,length(camp2)*values,type="s",col=7)
 plot.new()
 legend("center",legend=c("Original","DI"),col=c("red",7),lwd = 5, xpd = FALSE, horiz = TRUE, cex = 1, seg.len=1, bty = 'n')
 
 # code for third campylobacteriosis dataset
-par(mfrow=c(3,2))
+par(mfrow=c(2,4))
 x <- seq(0,5,by=0.01)
+
+# Lnorm
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:45){
+values <- append(values,fun01(a=0.767,b=0.389,i))}
+y <- seq(0,44)
+hist(camp3,breaks=seq(0,5,by=1),main="Campylobacter 3 with Log-normal",xlab="Time in Days",ylab="Density",ylim=c(0,60))
+lines(x,length(camp3)*dlnorm(x,meanlog=1.153,sdlog=0.302),xlim=c(0,45),col="red")
+lines(y,length(camp3)*values,type="s",col=7)
+
+# Weibull
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:45){
+values <- append(values,fun01(a=2.791,b=2.600,i))}
+y <- seq(0,44)
+hist(camp3,breaks=seq(0,5,by=1),main="Campylobacter 3 with Weibull",xlab="Time in Days",ylab="Density",ylim=c(0,60))
+lines(x,length(camp3)*dweibull(x,shape=3.698,scale=3.677),xlim=c(0,45),col="red")
+lines(y,length(camp3)*values,type="s",col=7)
+
+
 # Gamma
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
@@ -3138,7 +3404,7 @@ values <- c()
 for (i in 1:5){
 values <- append(values,fun01(a=6.586,b=2.845,i))}
 y <- seq(0,4)
-hist(camp3,breaks=seq(0,5,by=1),main="Campylobacter 3 with Gamma Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,60))
+hist(camp3,breaks=seq(0,5,by=1),main="Campylobacter 3 with Gamma",xlab="Time in Days",ylab="Density",ylim=c(0,60))
 lines(x,length(camp3)*dgamma(x,shape=11.342,rate=3.423),xlim=c(0,5),col="red")
 lines(y,length(camp3)*values,type="s",col=7)
 # Burr Type III
@@ -3153,7 +3419,7 @@ values <- c()
 for (i in 1:5){
 values <- append(values,fun01(c=5.674,k=0.503,t=2.720,i))}
 y <- seq(0,4)
-hist(camp3,breaks=seq(0,5,by=1),main="Campylobacter 3 with Burr III Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,60))
+hist(camp3,breaks=seq(0,5,by=1),main="Campylobacter 3 with Burr III",xlab="Time in Days",ylab="Density",ylim=c(0,60))
 lines(x,length(camp3)*dburr3(x,5.793,0.912,3.268),xlim=c(0,5),col="red")
 lines(y,length(camp3)*values,type="s",col=7)
 # Burr Type X
@@ -3168,7 +3434,7 @@ values <- c()
 for (i in 1:5){
 values <- append(values,fun01(c=2.050,k=1.911,i))}
 y <- seq(0,4)
-hist(camp3,breaks=seq(0,5,by=1),main="Campylobacter 3 with Burr X Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,60))
+hist(camp3,breaks=seq(0,5,by=1),main="Campylobacter 3 with Burr X",xlab="Time in Days",ylab="Density",ylim=c(0,60))
 lines(x,length(camp3)*dburr10(c=2.441,k=3.639,x),xlim=c(0,5),col="red")
 lines(y,length(camp3)*values,type="s",col=7)
 # Burr Type XII
@@ -3183,7 +3449,7 @@ values <- c()
 for (i in 1:5){
 values <- append(values,fun01(c=2.793,k=582.572,s=25.387,i))}
 y <- seq(0,4)
-hist(camp3,breaks=seq(0,5,by=1),main="Campylobacter 3 with Burr XII Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,60))
+hist(camp3,breaks=seq(0,5,by=1),main="Campylobacter 3 with Burr XII",xlab="Time in Days",ylab="Density",ylim=c(0,60))
 lines(x,length(camp3)*dburr12(c=4.069,k=6.228,s=5.319,x),xlim=c(0,5),col="red")
 lines(y,length(camp3)*values,type="s",col=7)
 # Derived Burr
@@ -3198,15 +3464,48 @@ values <- c()
 for (i in 1:5){
 values <- append(values,fun01(a=2.362,b=1.187,T=2.212,i))}
 y <- seq(0,4)
-hist(camp3,breaks=seq(0,5,by=1),main="Campylobacter 3 with Derived Burr Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,60))
+hist(camp3,breaks=seq(0,5,by=1),main="Campylobacter 3 with Derived Burr",xlab="Time in Days",ylab="Density",ylim=c(0,60))
 lines(x,length(camp3)*dburrNEW(a=3.962,b=1.975,T=3.208,x),xlim=c(0,5),col="red")
 lines(y,length(camp3)*values,type="s",col=7)
 plot.new()
 legend("center",legend=c("Original","DI"),col=c("red",7),lwd = 5, xpd = FALSE, horiz = TRUE, cex = 1, seg.len=1, bty = 'n')
 
 # code for fourth campylobacteriosis dataset
-par(mfrow=c(3,2))
+par(mfrow=c(2,4))
 x <- seq(0,10,by=0.01)
+
+# Lnorm
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:45){
+values <- append(values,fun01(a=1.001,b=0.497,i))}
+y <- seq(0,44)
+hist(camp4,breaks=seq(0,11,by=1),main="Campylobacter 4 with Log-normal",xlab="Time in Days",ylab="Density",ylim=c(0,80))
+lines(x,length(camp4)*dlnorm(x,meanlog=1.327,sdlog=0.406),xlim=c(0,45),col="red")
+lines(y,length(camp4)*values,type="s",col=7)
+
+# Weibull
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:45){
+values <- append(values,fun01(a=2.015,b=3.465,i))}
+y <- seq(0,44)
+hist(camp4,breaks=seq(0,11,by=1),main="Campylobacter 4 with Weibull",xlab="Time in Days",ylab="Density",ylim=c(0,80))
+lines(x,length(camp4)*dweibull(x,shape=2.551,scale=4.580),xlim=c(0,45),col="red")
+lines(y,length(camp4)*values,type="s",col=7)
+
 # Gamma
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
@@ -3219,7 +3518,7 @@ values <- c()
 for (i in 1:11){
 values <- append(values,fun01(a=4.099,b=1.335,i))}
 y <- seq(0,10)
-hist(camp4,breaks=seq(0,11,by=1),main="Campylobacter 4 with Gamma Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,80))
+hist(camp4,breaks=seq(0,11,by=1),main="Campylobacter 4 with Gamma",xlab="Time in Days",ylab="Density",ylim=c(0,80))
 lines(x,length(camp4)*dgamma(x,shape=6.602,rate=1.621),xlim=c(0,11),col="red")
 lines(y,length(camp4)*values,type="s",col=7)
 # Burr Type III
@@ -3234,7 +3533,7 @@ values <- c()
 for (i in 1:11){
 values <- append(values,fun01(c=4.113,k=0.730,t=3.099,i))}
 y <- seq(0,10)
-hist(camp4,breaks=seq(0,11,by=1),main="Campylobacter 4 with Burr III Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,80))
+hist(camp4,breaks=seq(0,11,by=1),main="Campylobacter 4 with Burr III",xlab="Time in Days",ylab="Density",ylim=c(0,80))
 lines(x,length(camp4)*dburr3(x,5.106,0.829,3.999),xlim=c(0,11),col="red")
 lines(y,length(camp4)*values,type="s",col=7)
 # Burr Type X
@@ -3249,7 +3548,7 @@ values <- c()
 for (i in 1:11){
 values <- append(values,fun01(c=3.280,k=1.178,i))}
 y <- seq(0,10)
-hist(camp4,breaks=seq(0,11,by=1),main="Campylobacter 4 with Burr X Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,80))
+hist(camp4,breaks=seq(0,11,by=1),main="Campylobacter 4 with Burr X",xlab="Time in Days",ylab="Density",ylim=c(0,80))
 lines(x,length(camp4)*dburr10(c=3.555,k=2.028,x),xlim=c(0,11),col="red")
 lines(y,length(camp4)*values,type="s",col=7)
 # Burr Type XII
@@ -3264,7 +3563,7 @@ values <- c()
 for (i in 1:11){
 values <- append(values,fun01(c=3.436,k=2.211,s=2.976,i))}
 y <- seq(0,10)
-hist(camp4,breaks=seq(0,11,by=1),main="Campylobacter 4 with Burr XII Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,80))
+hist(camp4,breaks=seq(0,11,by=1),main="Campylobacter 4 with Burr XII",xlab="Time in Days",ylab="Density",ylim=c(0,80))
 lines(x,length(camp4)*dburr12(c=3.103,k=2.382,s=3.255,x),xlim=c(0,11),col="red")
 lines(y,length(camp4)*values,type="s",col=7)
 # Derived Burr
@@ -3279,15 +3578,49 @@ values <- c()
 for (i in 1:11){
 values <- append(values,fun01(a=2.930,b=4.144,T=2.773,i))}
 y <- seq(0,10)
-hist(camp4,breaks=seq(0,11,by=1),main="Campylobacter 4 with Derived Burr Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,80))
+hist(camp4,breaks=seq(0,11,by=1),main="Campylobacter 4 with Derived Burr",xlab="Time in Days",ylab="Density",ylim=c(0,80))
 lines(x,length(camp4)*dburrNEW(a=4.108,b=5.976,T=3.801,x),xlim=c(0,11),col="red")
 lines(y,length(camp4)*values,type="s",col=7)
 plot.new()
 legend("center",legend=c("Original","DI"),col=c("red",7),lwd = 5, xpd = FALSE, horiz = TRUE, cex = 1, seg.len=1, bty = 'n')
 
 # code for fifth campylobacteriosis dataset
-par(mfrow=c(3,2))
+par(mfrow=c(2,4))
 x <- seq(0,14,by=0.01)
+
+# Lnorm
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:45){
+values <- append(values,fun01(a=0.989,b=0.727,i))}
+y <- seq(0,44)
+hist(camp5,breaks=seq(0,14,by=1),main="Campylobacter 5 with Log-normal",xlab="Time in Days",ylab="Density",ylim=c(0,40))
+lines(x,length(camp5)*dlnorm(x,meanlog=1.331,sdlog=0.557),xlim=c(0,45),col="red")
+lines(y,length(camp5)*values,type="s",col=7)
+
+# Weibull
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:45){
+values <- append(values,fun01(a=1.613,b=3.723,i))}
+y <- seq(0,44)
+hist(camp5,breaks=seq(0,14,by=1),main="Campylobacter 5 with Weibull",xlab="Time in Days",ylab="Density",ylim=c(0,40))
+lines(x,length(camp5)*dweibull(x,shape=2.140,scale=4.903),xlim=c(0,45),col="red")
+lines(y,length(camp5)*values,type="s",col=7)
+
+
 # Gamma
 fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
 fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
@@ -3300,7 +3633,7 @@ values <- c()
 for (i in 1:14){
 values <- append(values,fun01(a=2.165,b=0.647,i))}
 y <- seq(0,13)
-hist(camp5,breaks=seq(0,14,by=1),main="Campylobacter 5 with Gamma Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,40))
+hist(camp5,breaks=seq(0,14,by=1),main="Campylobacter 5 with Gamma",xlab="Time in Days",ylab="Density",ylim=c(0,40))
 lines(x,length(camp5)*dgamma(x,shape=3.814,rate=0.879),xlim=c(0,14),col="red")
 lines(y,length(camp5)*values,type="s",col=7)
 # Burr Type III
@@ -3315,7 +3648,7 @@ values <- c()
 for (i in 1:14){
 values <- append(values,fun01(c=5.683,k=0.208,t=5.549,i))}
 y <- seq(0,13)
-hist(camp5,breaks=seq(0,14,by=1),main="Campylobacter 5 with Burr III Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,40))
+hist(camp5,breaks=seq(0,14,by=1),main="Campylobacter 5 with Burr III",xlab="Time in Days",ylab="Density",ylim=c(0,40))
 lines(x,length(camp5)*dburr3(x,5.630,0.349,5.800),xlim=c(0,14),col="red")
 lines(y,length(camp5)*values,type="s",col=7)
 # Burr Type X
@@ -3330,7 +3663,7 @@ values <- c()
 for (i in 1:14){
 values <- append(values,fun01(c=4.491,k=0.681,i))}
 y <- seq(0,13)
-hist(camp5,breaks=seq(0,14,by=1),main="Campylobacter 5 with Burr X Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,40))
+hist(camp5,breaks=seq(0,14,by=1),main="Campylobacter 5 with Burr X",xlab="Time in Days",ylab="Density",ylim=c(0,40))
 lines(x,length(camp5)*dburr10(c=4.592,k=1.178,x),xlim=c(0,14),col="red")
 lines(y,length(camp5)*values,type="s",col=7)
 # Burr Type XII
@@ -3345,7 +3678,7 @@ values <- c()
 for (i in 1:14){
 values <- append(values,fun01(c=1.614,k=1015.609,s=271.197,i))}
 y <- seq(0,13)
-hist(camp5,breaks=seq(0,14,by=1),main="Campylobacter 5 with Burr XII Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,40))
+hist(camp5,breaks=seq(0,14,by=1),main="Campylobacter 5 with Burr XII",xlab="Time in Days",ylab="Density",ylim=c(0,40))
 lines(x,length(camp5)*dburr12(c=2.414,k=6.654,s=9.502,x),xlim=c(0,14),col="red")
 lines(y,length(camp5)*values,type="s",col=7)
 # Derived Burr
@@ -3360,7 +3693,7 @@ values <- c()
 for (i in 1:14){
 values <- append(values,fun01(a=0.469,b=1.541,T=3.136,i))}
 y <- seq(0,13)
-hist(camp5,breaks=seq(0,14,by=1),main="Campylobacter 5 with Derived Burr Model Fits",xlab="Time in Days",ylab="Density",ylim=c(0,40))
+hist(camp5,breaks=seq(0,14,by=1),main="Campylobacter 5 with Derived Burr",xlab="Time in Days",ylab="Density",ylim=c(0,40))
 lines(x,length(camp5)*dburrNEW(a=1.526,b=2.263,T=4.103,x),xlim=c(0,14),col="red")
 lines(y,length(camp5)*values,type="s",col=7)
 plot.new()
