@@ -3779,3 +3779,76 @@ ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
   labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(beta[D])) +
   coord_fixed()
 ggheatmap + coord_fixed(ratio=4)
+
+
+
+
+
+# simulation code and code to produce the heatmaps in final figure
+shape <- seq(0.5,5,by=0.025)
+mean <- seq(1,20,by=0.1)
+alpha <- c()
+beta <- c()
+T <- c()
+
+for (i in shape){
+for (j in mean){
+
+data <- ceiling(runif(n=1000)+rgamma(n=1000,shape=i,rate=i/j))
+
+
+fun01 <- function(a,b,T,S){log(integrate(function(x) pburrNEW(x,a,b,T)-pburrNEW(x-1,a,b,T),S-1,S)$value)}
+ll <- function(pars){
+my.sum <- 0
+for (f in 1:length(data)){
+my.sum <- my.sum + fun01(pars[1],pars[2],pars[3],data[f])}
+return(my.sum)
+}
+result1 <- optim(c(a=i,b=j/i,T=j),lower=c(0.05,0.6*j/i,0.1*j),upper=c(3*i,3*j/i,2*j),ll,control = list(fnscale = -1),hessian=TRUE)
+
+alpha <- append(alpha,result1$par[1])
+beta <- append(beta,result1$par[2])
+T <- append(T,result1$par[3])
+}
+}
+
+data <- expand.grid(X=mean,Y=shape)
+data$Z <- T
+ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
+  geom_raster() +
+  scale_fill_gradientn(colours=rainbow(5)) +
+  geom_hline(yintercept=1,linetype="dotted") +
+  scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
+  scale_y_continuous(limits=c(0.5,5), expand = c(0, 0)) +
+  theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=20), axis.title.y=element_text(size=20), legend.title=element_text(size=20)) +
+  labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(T[D])) +
+  coord_fixed()
+ggheatmap + coord_fixed(ratio=4)
+
+
+data <- expand.grid(X=mean,Y=shape)
+data$Z <- alpha
+ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
+  geom_raster() +
+  scale_fill_gradientn(colours=rainbow(5)) +
+  geom_hline(yintercept=1,linetype="dotted") +
+  scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
+  scale_y_continuous(limits=c(0.5,5), expand = c(0, 0)) +
+  theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=20), axis.title.y=element_text(size=20), legend.title=element_text(size=20)) +
+  labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(alpha[D])) +
+  coord_fixed()
+ggheatmap + coord_fixed(ratio=4)
+
+
+data <- expand.grid(X=mean,Y=shape)
+data$Z <- beta
+ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
+  geom_raster() +
+  scale_fill_gradientn(colours=rainbow(5)) +
+  geom_hline(yintercept=1,linetype="dotted") +
+  scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
+  scale_y_continuous(limits=c(0.5,5), expand = c(0, 0)) +
+  theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=20), axis.title.y=element_text(size=20), legend.title=element_text(size=20)) +
+  labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(beta[D])) +
+  coord_fixed()
+ggheatmap + coord_fixed(ratio=4)
