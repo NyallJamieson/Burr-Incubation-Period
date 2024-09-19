@@ -1,0 +1,204 @@
+dburrNEW <- function(x,a,b,T){(x/b+a)*(T/x)^(a)*exp((T-x)/b)/(x*(1+(T/x)^(a)*exp((T-x)/b))^2)}
+pburrNEW <- function(x,a,b,T){ifelse(x>0,(1+(T/x)^(a)*exp((T-x)/b))^(-1),0)}
+
+# vary alpha
+alpha <- seq(0.1,10.0,by=0.1)
+bias1 <- c()
+bias2 <- c()
+bias3 <- c()
+cov1 <- c()
+cov2 <- c()
+cov3 <- c()
+
+for (i in alpha){
+est_alpha <- c()
+est_beta <- c()
+est_T <- c()
+count1 <- 0
+count2 <- 0
+count3 <- 0
+
+for (c in 1:100){
+print(c)
+
+exposure <- runif(n=1000)
+burr <- c()
+u <- runif(n=1000)
+for (p in 1:1000){
+burr <- append(burr,uniroot(function(x) pburrNEW(x,a=i,b=2.738,T=6.05)-u[p],lower=0,upper=1000)$root)}
+censored <- ceiling(exposure+burr)
+
+fun01 <- function(a,b,T,S){log(integrate(function(x) pburrNEW(x,a,b,T)-pburrNEW(x-1,a,b,T),S-1,S)$value)}
+ll <- function(pars){
+my.sum <- 0
+for (i in 1:length(censored)){
+my.sum <- my.sum + fun01(pars[1],pars[2],pars[3],censored[i])}
+return(my.sum)
+}
+result <- optim(c(a=2,b=2,T=2),lower=c(0.01*i,1,1),upper=c(5*i,5,10),ll,control = list(fnscale = -1),hessian=TRUE)
+
+hess <- diag(inv(-result$hessian))
+
+est_alpha <- append(est_alpha,result$par[1])
+est_beta <- append(est_beta,result$par[2])
+est_T <- append(est_T,result$par[3])
+
+if (abs(result$par[1]-i)/hess[1]^0.5<1.96){
+count1 <- count1 + 1}
+if (abs(result$par[2]-2.738)/hess[2]^0.5<1.96){
+count2 <- count2 + 1}
+if (abs(result$par[3]-6.050)/hess[3]^0.5<1.96){
+count3 <- count3 + 1}
+}
+
+bias1 <- append(bias1,mean(est_alpha)-i)
+bias2 <- append(bias2,mean(est_beta)-2.738)
+bias3 <- append(bias3,mean(est_T)-6.050)
+
+cov1 <- append(cov1,count1/100)
+cov2 <- append(cov2,count2/100)
+cov3 <- append(cov3,count3/100)
+
+print(bias1)
+print(bias2)
+print(bias3)
+print(cov1)
+print(cov2)
+print(cov3)
+}
+
+
+# vary beta
+
+beta <- seq(1.1,10.0,by=0.1)
+bias1 <- c()
+bias2 <- c()
+bias3 <- c()
+cov1 <- c()
+cov2 <- c()
+cov3 <- c()
+
+for (i in beta){
+est_alpha <- c()
+est_beta <- c()
+est_T <- c()
+count1 <- 0
+count2 <- 0
+count3 <- 0
+
+for (c in 1:100){
+print(c)
+
+exposure <- runif(n=1000)
+burr <- c()
+u <- runif(n=1000)
+for (p in 1:1000){
+burr <- append(burr,uniroot(function(x) pburrNEW(x,a=1.725,b=i,T=6.05)-u[p],lower=0,upper=1000)$root)}
+censored <- ceiling(exposure+burr)
+
+fun01 <- function(a,b,T,S){log(integrate(function(x) pburrNEW(x,a,b,T)-pburrNEW(x-1,a,b,T),S-1,S)$value)}
+ll <- function(pars){
+my.sum <- 0
+for (f in 1:length(censored)){
+my.sum <- my.sum + fun01(pars[1],pars[2],pars[3],censored[f])}
+return(my.sum)
+}
+result <- optim(c(a=1.85,b=i,T=median(censored)),lower=c(0.5,0.5,1),upper=c(10,20,10),ll,control = list(fnscale = -1),hessian=TRUE)
+
+hess <- diag(inv(-result$hessian))
+
+est_alpha <- append(est_alpha,result$par[1])
+est_beta <- append(est_beta,result$par[2])
+est_T <- append(est_T,result$par[3])
+
+if (abs(result$par[1]-1.725)/hess[1]^0.5<1.96){
+count1 <- count1 + 1}
+if (abs(result$par[2]-i)/hess[2]^0.5<1.96){
+count2 <- count2 + 1}
+if (abs(result$par[3]-6.050)/hess[3]^0.5<1.96){
+count3 <- count3 + 1}
+}
+
+bias1 <- append(bias1,mean(est_alpha)-1.725)
+bias2 <- append(bias2,mean(est_beta)-i)
+bias3 <- append(bias3,mean(est_T)-6.050)
+
+cov1 <- append(cov1,count1/100)
+cov2 <- append(cov2,count2/100)
+cov3 <- append(cov3,count3/100)
+
+print(bias1)
+print(bias2)
+print(bias3)
+print(cov1)
+print(cov2)
+print(cov3)
+}
+
+
+# vary T
+
+T <- seq(1.1,15,by=0.1)
+bias1 <- c()
+bias2 <- c()
+bias3 <- c()
+cov1 <- c()
+cov2 <- c()
+cov3 <- c()
+
+for (i in T){
+est_alpha <- c()
+est_beta <- c()
+est_T <- c()
+count1 <- 0
+count2 <- 0
+count3 <- 0
+
+for (c in 1:100){
+print(c)
+
+exposure <- runif(n=1000)
+burr <- c()
+u <- runif(n=1000)
+for (p in 1:1000){
+burr <- append(burr,uniroot(function(x) pburrNEW(x,a=1.725,b=2.738,T=i)-u[p],lower=0,upper=1000)$root)}
+censored <- ceiling(exposure+burr)
+
+fun01 <- function(a,b,T,S){log(integrate(function(x) pburrNEW(x,a,b,T)-pburrNEW(x-1,a,b,T),S-1,S)$value)}
+ll <- function(pars){
+my.sum <- 0
+for (i in 1:length(censored)){
+my.sum <- my.sum + fun01(pars[1],pars[2],pars[3],censored[i])}
+return(my.sum)
+}
+result <- optim(c(a=2,b=2,T=i),lower=c(0.5,1,0.2*i),upper=c(5,5,5*i),ll,control = list(fnscale = -1),hessian=TRUE)
+
+hess <- diag(inv(-result$hessian))
+
+est_alpha <- append(est_alpha,result$par[1])
+est_beta <- append(est_beta,result$par[2])
+est_T <- append(est_T,result$par[3])
+
+if (abs(result$par[1]-1.725)/hess[1]^0.5<1.96){
+count1 <- count1 + 1}
+if (abs(result$par[2]-2.738)/hess[2]^0.5<1.96){
+count2 <- count2 + 1}
+if (abs(result$par[3]-i)/hess[3]^0.5<1.96){
+count3 <- count3 + 1}
+}
+
+bias1 <- append(bias1,mean(est_alpha)-1.725)
+bias2 <- append(bias2,mean(est_beta)-2.738)
+bias3 <- append(bias3,mean(est_T)-i)
+
+cov1 <- append(cov1,count1/100)
+cov2 <- append(cov2,count2/100)
+cov3 <- append(cov3,count3/100)
+
+print(bias1)
+print(bias2)
+print(bias3)
+print(cov1)
+print(cov2)
+print(cov3)
+}
