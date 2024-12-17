@@ -1,16 +1,222 @@
-# Save plot with 600 DPI resolution
-tiff("Fig2.tiff", width = 8, height = 6, units = "in", res = 600, compression = "lzw")
+# code for plotting likelihood fitted models and DI likelihood fitted curve models to legionnaires' data in figure 3
+x <- seq(0,20,by=0.01)
 
-# code for producing figure 2
-hist(legionnaires,breaks=seq(0,20,by=1),xlab="Time in Days",ylab="Density",main="Melbourne Data with Model Fits")
-lines(seq(0,20,by=0.01),length(legionnaires)*dburr3(seq(0,20,by=0.01),c=5.664,k=0.444,s=7.690),col=2)
-lines(seq(0,20,by=0.01),length(legionnaires)*dburr10(seq(0,20,by=0.01),k=1.525,c=6.054),col=3)
-lines(seq(0,20,by=0.01),length(legionnaires)*dburr12(seq(0,20,by=0.01),c=2.955,k=4.451,s=10.031),col=4)
-lines(seq(0,20,by=0.01),length(legionnaires)*dburrNEW(seq(0,20,by=0.01),a=1.725,b=2.738,T=6.050),col=7)
-lines(seq(0,20,by=0.01),length(legionnaires)*dgamma(seq(0,20,by=0.01),shape=4.963,rate=0.785),col=8)
-lines(seq(0,20,by=0.01),length(legionnaires)*dlnorm(seq(0,20,by=0.01),meanlog=1.740,sdlog=0.488),col=9)
-lines(seq(0,20,by=0.01),length(legionnaires)*dweibull(seq(0,20,by=0.01),shape=2.447,scale=7.129),col=5)
-legend(x="topright",legend=c("Type III", "Type X", "Type XII", "Derived", "Gamma", "Lognormal", "Weibull"),lty=c(1,1,1,1,1,1,1),col=c(2,3,4,7,8,9,5),lwd=2)
+# Save plot with 600 DPI resolution
+tiff("Fig3.1.tiff", width = 8, height = 6, units = "in", res = 600, compression = "lzw")
+
+# Increase font size globally
+par(cex.lab = 2,   # Axis labels font size (1.5x default size)
+    cex.main = 2,  # Title font size
+    cex.axis = 1.2,  # Axis tick label font size
+    mar = c(5, 5, 4, 2) + 0.1)  # Adjust margins (optional for better space)
+# Log-normal
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,exp(-(log(y-x)-a)^2/(2*b^2))/((y-x)*b*(2*pi)^0.5),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:20){
+values <- append(values,fun01(a=1.531,b=0.576,i))
+}
+y <- seq(0,19)
+hist(MelbourneIP,breaks=seq(0,20,by=1),main="Log-normal Distributed Models",xlab="Time in Days",ylab="Density")
+lines(x,length(MelbourneIP)*dlnorm(x,meanlog=1.740,sdlog=0.488),xlim=c(0,20),col="red")
+lines(y,length(MelbourneIP)*values,type="s",col=7)
+
+# Close the device
+dev.off()
+
+
+
+# Save plot with 600 DPI resolution
+tiff("Fig3.2.tiff", width = 8, height = 6, units = "in", res = 600, compression = "lzw")
+
+# Increase font size globally
+par(cex.lab = 2,   # Axis labels font size (1.5x default size)
+    cex.main = 2,  # Title font size
+    cex.axis = 1.2,  # Axis tick label font size
+    mar = c(5, 5, 4, 2) + 0.1)  # Adjust margins (optional for better space)
+# Weibull
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,(a/b)*((y-x)/b)^(a-1)*exp(-((y-x)/b)^a),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:20){
+values <- append(values,fun01(a=2.058,b=6.003,i))
+}
+y <- seq(0,19)
+hist(MelbourneIP,breaks=seq(0,20,by=1),main="Weibull Distributed Models",xlab="Time in Days",ylab="Density")
+lines(x,length(MelbourneIP)*dweibull(x,shape=2.447,scale=7.129),xlim=c(0,20),col="red")
+lines(y,length(MelbourneIP)*values,type="s",col=7)
+
+# Close the device
+dev.off()
+
+
+
+
+# Save plot with 600 DPI resolution
+tiff("Fig3.3.tiff", width = 8, height = 6, units = "in", res = 600, compression = "lzw")
+
+# Increase font size globally
+par(cex.lab = 2,   # Axis labels font size (1.5x default size)
+    cex.main = 2,  # Title font size
+    cex.axis = 1.2,  # Axis tick label font size
+    mar = c(5, 5, 4, 2) + 0.1)  # Adjust margins (optional for better space)
+# Gamma
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.1 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,S,x,y){ifelse(y-x>0,b^(a)*(y-x)^(a-1)*exp(-b*(y-x))/gamma(a),0)}
+fun01.2 <- function(a,b,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,S){ifelse(S!=1,fun01.2(a,b,S),fun01.1(a,b,S))}
+values <- c()
+for (i in 1:20){
+values <- append(values,fun01(a=3.479,b=0.653,i))}
+y <- seq(0,19)
+hist(MelbourneIP,breaks=seq(0,20,by=1),main="Gamma Distributed Models",xlab="Time in Days",ylab="Density")
+lines(x,length(MelbourneIP)*dgamma(x,shape=4.962,rate=0.785),xlim=c(0,20),col="red")
+lines(y,length(MelbourneIP)*values,type="s",col=7)
+
+# Close the device
+dev.off()
+
+
+
+
+# Save plot with 600 DPI resolution
+tiff("Fig3.4.tiff", width = 8, height = 6, units = "in", res = 600, compression = "lzw")
+
+# Increase font size globally
+par(cex.lab = 2,   # Axis labels font size (1.5x default size)
+    cex.main = 2,  # Title font size
+    cex.axis = 1.2,  # Axis tick label font size
+    mar = c(5, 5, 4, 2) + 0.1)  # Adjust margins (optional for better space)
+# Burr Type III
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.1 <- function(c,k,t,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(c,k,t,S,x,y){ifelse(y-x>0,c*k*((y-x)/t)^(-c-1)*(1+((y-x)/t)^(-c))^(-k-1)/t,0)}
+fun01.2 <- function(c,k,t,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,t,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(c,k,t,S){ifelse(S!=1,fun01.2(c,k,t,S),fun01.1(c,k,t,S))}
+values <- c()
+for (i in 1:20){
+values <- append(values,fun01(c=4.388,k=0.5,t=6.416,i))}
+y <- seq(0,19)
+hist(MelbourneIP,breaks=seq(0,20,by=1),main="Burr Type III Distributed Models",xlab="Time in Days",ylab="Density")
+lines(x,length(MelbourneIP)*dburr3(x,5.320,0.5,7.448),xlim=c(0,20),col="red")
+lines(y,length(MelbourneIP)*values,type="s",col=7)
+
+# Close the device
+dev.off()
+
+
+
+
+# Save plot with 600 DPI resolution
+tiff("Fig3.5.tiff", width = 8, height = 6, units = "in", res = 600, compression = "lzw")
+
+# Increase font size globally
+par(cex.lab = 2,   # Axis labels font size (1.5x default size)
+    cex.main = 2,  # Title font size
+    cex.axis = 1.2,  # Axis tick label font size
+    mar = c(5, 5, 4, 2) + 0.1)  # Adjust margins (optional for better space)
+# Burr Type X
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.1 <- function(c,k,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(c,k,S,x,y){ifelse(y-x>0,2*k*(y-x)*c^(-2)*exp(-((y-x)/c)^(2))*(1-exp(-((y-x)/c)^(2)))^(k-1),0)}
+fun01.2 <- function(c,k,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(c,k,S){ifelse(S!=1,fun01.2(c,k,S),fun01.1(c,k,S))}
+values <- c()
+for (i in 1:20){
+values <- append(values,fun01(c=5.848319,k=1.064960,i))}
+y <- seq(0,19)
+hist(MelbourneIP,breaks=seq(0,20,by=1),main="Burr Type X Distributed Models",xlab="Time in Days",ylab="Density")
+lines(x,length(MelbourneIP)*dburr10(c=6.054270,k=1.525209,x),xlim=c(0,20),col="red")
+lines(y,length(MelbourneIP)*values,type="s",col=7)
+
+# Close the device
+dev.off()
+
+
+
+# Save plot with 600 DPI resolution
+tiff("Fig3.6.tiff", width = 8, height = 6, units = "in", res = 600, compression = "lzw")
+
+# Increase font size globally
+par(cex.lab = 2,   # Axis labels font size (1.5x default size)
+    cex.main = 2,  # Title font size
+    cex.axis = 1.2,  # Axis tick label font size
+    mar = c(5, 5, 4, 2) + 0.1)  # Adjust margins (optional for better space)
+# Burr Type XII
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.1 <- function(c,k,s,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(c,k,s,S,x,y){ifelse(y-x>0,c*(k-1)*(1+((y-x)/s)^(c))^(-k)*((y-x)/s)^(c-1)/s,0)}
+fun01.2 <- function(c,k,s,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(c,k,s,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(c,k,s,S){ifelse(S!=1,fun01.2(c,k,s,S),fun01.1(c,k,s,S))}
+values <- c()
+for (i in 1:20){
+values <- append(values,fun01(c=2.249,k=8.643,s=14.194,i))}
+y <- seq(0,19)
+hist(MelbourneIP,breaks=seq(0,20,by=1),main="Burr Type XII Distributed Models",xlab="Time in Days",ylab="Density")
+lines(x,length(MelbourneIP)*dburr12(c=2.955,k=4.448,s=10.027,x),xlim=c(0,20),col="red")
+lines(y,length(MelbourneIP)*values,type="s",col=7)
+
+# Close the device
+dev.off()
+
+
+
+# Save plot with 600 DPI resolution
+tiff("Fig3.7.tiff", width = 8, height = 6, units = "in", res = 600, compression = "lzw")
+
+# Increase font size globally
+par(cex.lab = 2,   # Axis labels font size (1.5x default size)
+    cex.main = 2,  # Title font size
+    cex.axis = 1.2,  # Axis tick label font size
+    mar = c(5, 5, 4, 2) + 0.1)  # Adjust margins (optional for better space)
+# Derived Burr
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
+fun01.1 <- function(a,b,T,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), x, S)$value})},0,1)$value}
+my.sum <- 0
+fun0 <- function(a,b,T,S,x,y){ifelse(y-x>0,((y-x)/b+a)*exp((T-(y-x))/b+a*log(T/(y-x)))/((y-x)*(1+exp((T-(y-x))/b+a*log(T/(y-x))))^2),0)}
+fun01.2 <- function(a,b,T,S){integrate(function(x){sapply(x,function(x){integrate(function(y) fun0(a,b,T,S,x,y), S-1, S)$value})},0,1)$value}
+my.sum <- 0
+fun01 <- function(a,b,T,S){ifelse(S!=1,fun01.2(a,b,T,S),fun01.1(a,b,T,S))}
+values <- c()
+for (i in 1:20){
+values <- append(values,fun01(a=0.880,b=2.110,T=5.075,i))}
+y <- seq(0,19)
+hist(MelbourneIP,breaks=seq(0,20,by=1),main="Derived Burr Distributed Models",xlab="Time in Days",ylab="Density")
+lines(x,length(MelbourneIP)*dburrNEW(a=1.725,b=2.738,T=6.050,x),xlim=c(0,20),col="red")
+lines(y,length(MelbourneIP)*values,type="s",col=7)
+
+# Close the device
+dev.off()
+
+
+tiff("Fig3.8.tiff", width = 8, height = 6, units = "in", res = 600, compression = "lzw")
+
+# Increase font size globally
+par(cex.lab = 2,   # Axis labels font size (1.5x default size)
+    cex.main = 2,  # Title font size
+    cex.axis = 1.2,  # Axis tick label font size
+    mar = c(5, 5, 4, 2) + 0.1)  # Adjust margins (optional for better space)
+plot.new()
+legend("center",legend=c("Original","DI"),col=c("red",7),lwd = 5, xpd = FALSE, horiz = TRUE, cex = 1, seg.len=1, bty = 'n')
 
 # Close the device
 dev.off()
