@@ -1,0 +1,16 @@
+# Save plot with 600 DPI resolution
+tiff("high_res_plot.tiff", width = 8, height = 6, units = "in", res = 600)
+
+# code for producing figure 2
+hist(legionnaires,breaks=seq(0,20,by=1),xlab="Time in Days",ylab="Density",main="Melbourne Data with Model Fits")
+lines(seq(0,20,by=0.01),length(legionnaires)*dburr3(seq(0,20,by=0.01),c=5.664,k=0.444,s=7.690),col=2)
+lines(seq(0,20,by=0.01),length(legionnaires)*dburr10(seq(0,20,by=0.01),k=1.525,c=6.054),col=3)
+lines(seq(0,20,by=0.01),length(legionnaires)*dburr12(seq(0,20,by=0.01),c=2.955,k=4.451,s=10.031),col=4)
+lines(seq(0,20,by=0.01),length(legionnaires)*dburrNEW(seq(0,20,by=0.01),a=1.725,b=2.738,T=6.050),col=7)
+lines(seq(0,20,by=0.01),length(legionnaires)*dgamma(seq(0,20,by=0.01),shape=4.963,rate=0.785),col=8)
+lines(seq(0,20,by=0.01),length(legionnaires)*dlnorm(seq(0,20,by=0.01),meanlog=1.740,sdlog=0.488),col=9)
+lines(seq(0,20,by=0.01),length(legionnaires)*dweibull(seq(0,20,by=0.01),shape=2.447,scale=7.129),col=5)
+legend(x="topright",legend=c("Type III", "Type X", "Type XII", "Derived", "Gamma", "Lognormal", "Weibull"),lty=c(1,1,1,1,1,1,1),col=c(2,3,4,7,8,9,5),lwd=2)
+
+# Close the device
+dev.off()
