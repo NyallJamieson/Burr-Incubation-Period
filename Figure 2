@@ -1,5 +1,5 @@
 # Save plot with 600 DPI resolution
-tiff("high_res_plot.tiff", width = 8, height = 6, units = "in", res = 600)
+tiff("Fig2.tiff", width = 8, height = 6, units = "in", res = 600, compression = "lzw")
 
 # code for producing figure 2
 hist(legionnaires,breaks=seq(0,20,by=1),xlab="Time in Days",ylab="Density",main="Melbourne Data with Model Fits")
