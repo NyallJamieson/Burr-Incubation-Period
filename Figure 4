@@ -1,0 +1,106 @@
+shape <- seq(0.5,5,by=0.025)
+mean <- seq(1,20,by=0.1)
+
+# standard likelihood fitting methods
+alpha_data1 <- read.csv("alpha_standard.csv")[,2]
+beta_data1 <- read.csv("beta_standard.csv")[,2]
+T_data1 <- read.csv("T_standard.csv")[,2]
+
+# alpha
+data <- expand.grid(X=mean,Y=shape)
+data$Z <- alpha_data1
+ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
+    geom_raster() +
+    scale_fill_gradientn(colours=rainbow(5)) +
+    geom_hline(yintercept=1,linetype="dotted") +
+    scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
+    scale_y_continuous(limits=c(0.5,5), expand = c(0, 0)) +
+    theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=35), axis.title.y=element_text(size=35), legend.title=element_text(size=35)) +
+    labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(alpha[D])) +
+    coord_fixed(ratio=4)
+ggsave("Figure4a.tiff", plot = ggheatmap, width = 6, height = 6, units = "in", dpi = 600, compression = "lzw")
+
+# beta
+data <- expand.grid(X=mean,Y=shape)
+data$Z <- beta_data1
+ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
+  geom_raster() +
+  scale_fill_gradientn(colours=rainbow(5)) +
+  geom_hline(yintercept=1,linetype="dotted") +
+  scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
+  scale_y_continuous(limits=c(0.5,5), expand = c(0, 0)) +
+  theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=35), axis.title.y=element_text(size=35), legend.title=element_text(size=35)) +
+  labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(beta[D])) +
+  coord_fixed(ratio=4)
+ggsave("Figure4c.tiff", plot = ggheatmap, width = 6, height = 6, units = "in", dpi = 600, compression = "lzw")
+
+
+# T
+data <- expand.grid(X=mean,Y=shape)
+data$Z <- T_data1
+ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
+  geom_raster() +
+  scale_fill_gradientn(colours=rainbow(5)) +
+  geom_hline(yintercept=1,linetype="dotted") +
+  scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
+  scale_y_continuous(limits=c(0.5,5), expand = c(0, 0)) +
+  theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=35), axis.title.y=element_text(size=35), legend.title=element_text(size=35)) +
+  labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(T[D])) +
+  coord_fixed(ratio=4)
+ggsave("Figure4e.tiff", plot = ggheatmap, width = 6, height = 6, units = "in", dpi = 600, compression = "lzw")
+
+
+
+
+
+
+
+
+# double interval censoring likelihood fitting methods
+alpha_data2 <- read.csv("alpha_di.csv")[,2]
+beta_data2 <- read.csv("beta_di.csv")[,2]
+T_data2 <- read.csv("T_di.csv")[,2]
+
+# alpha
+data <- expand.grid(X=mean,Y=shape)
+data$Z <- alpha_data2
+ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
+    geom_raster() +
+    scale_fill_gradientn(colours=rainbow(5)) +
+    geom_hline(yintercept=1,linetype="dotted") +
+    scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
+    scale_y_continuous(limits=c(0.5,5), expand = c(0, 0)) +
+    theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=35), axis.title.y=element_text(size=35), legend.title=element_text(size=35)) +
+    labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(alpha[D])) +
+    coord_fixed(ratio=4)
+ggsave("Figure4b.tiff", plot = ggheatmap, width = 6, height = 6, units = "in", dpi = 600, compression = "lzw")
+
+
+# beta
+data <- expand.grid(X=mean,Y=shape)
+data$Z <- beta_data2
+ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
+  geom_raster() +
+  scale_fill_gradientn(colours=rainbow(5)) +
+  geom_hline(yintercept=1,linetype="dotted") +
+  scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
+  scale_y_continuous(limits=c(0.5,5), expand = c(0, 0)) +
+  theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=35), axis.title.y=element_text(size=35), legend.title=element_text(size=35)) +
+  labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(beta[D])) +
+  coord_fixed(ratio=4)
+ggsave("Figure4d.tiff", plot = ggheatmap, width = 6, height = 6, units = "in", dpi = 600, compression = "lzw")
+
+
+# T
+data <- expand.grid(X=mean,Y=shape)
+data$Z <- T_data2
+ggheatmap <- ggplot(data = data, aes(x=X, y=Y, fill=Z)) +
+  geom_raster() +
+  scale_fill_gradientn(colours=rainbow(5)) +
+  geom_hline(yintercept=1,linetype="dotted") +
+  scale_x_continuous(limits=c(1,20), expand = c(0, 0)) +
+  scale_y_continuous(limits=c(0.5,5), expand = c(0, 0)) +
+  theme(axis.text.x = element_text(angle = 0), axis.title.x=element_text(size=35), axis.title.y=element_text(size=35), legend.title=element_text(size=35)) +
+  labs(x=expression(mu[Gamma]),y=expression(alpha[Gamma]),fill=expression(T[D])) +
+  coord_fixed(ratio=4)
+ggsave("Figure4f.tiff", plot = ggheatmap, width = 6, height = 6, units = "in", dpi = 600, compression = "lzw")
