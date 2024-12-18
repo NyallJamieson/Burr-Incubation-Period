@@ -216,7 +216,7 @@ par(cex.lab = 2,   # Axis labels font size (1.5x default size)
     cex.axis = 1.2,  # Axis tick label font size
     mar = c(5, 5, 4, 2) + 0.1)  # Adjust margins (optional for better space)
 plot.new()
-legend("center",legend=c("Original","DI"),col=c("red",7),lwd = 5, xpd = FALSE, horiz = TRUE, cex = 1, seg.len=1, bty = 'n')
+legend("center",legend=c("Original","DI"),col=c("red",7),lwd = 5, xpd = FALSE, horiz = TRUE, cex = 3.5, seg.len=1, bty = 'n')
 
 # Close the device
 dev.off()
